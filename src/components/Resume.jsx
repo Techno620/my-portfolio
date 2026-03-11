@@ -1,6 +1,7 @@
 import React from "react";
 import { FileText, Download, Briefcase, GraduationCap } from "lucide-react";
 import { motion } from "framer-motion";
+import BackgroundEffects from "./BackgroundEffects";
 
 const Resume = ({ darkMode }) => {
   const experiences = [
@@ -33,10 +34,11 @@ const Resume = ({ darkMode }) => {
   return (
     <section
       id="resume"
-      className={`py-24 px-6 transition-colors duration-300 ${darkMode ? "bg-slate-900 text-slate-100" : "bg-slate-50 text-slate-800"
+      className={`relative overflow-hidden py-24 px-6 transition-colors duration-300 ${darkMode ? "bg-transparent text-slate-100" : "bg-slate-50 text-slate-800"
         }`}
     >
-      <div className="max-w-6xl mx-auto space-y-16">
+      <BackgroundEffects variant="resume" />
+      <div className="max-w-6xl mx-auto space-y-16 relative z-10">
 
         {/* Heading */}
         <div className="text-center">
@@ -45,12 +47,12 @@ const Resume = ({ darkMode }) => {
             whileInView={{ opacity: 1, y: 0 }}
             className="flex items-center justify-center gap-3 mb-4"
           >
-            <FileText className="text-blue-500" size={32} />
-            <h2 className="text-4xl font-extrabold tracking-tight">
+            <FileText className="text-blue-500" size={36} />
+            <h2 className="text-5xl font-extrabold tracking-tight">
               Resume & Journey
             </h2>
           </motion.div>
-          <p className={`max-w-2xl mx-auto text-lg ${darkMode ? "text-slate-400" : "text-slate-600"}`}>
+          <p className={`max-w-2xl mx-auto text-xl ${darkMode ? "text-slate-400" : "text-slate-600"}`}>
             A professional timeline of my training and academic background.
           </p>
         </div>
@@ -61,8 +63,8 @@ const Resume = ({ darkMode }) => {
           {/* Experience / Training */}
           <div className="space-y-8">
             <div className="flex items-center gap-3 mb-2">
-              <Briefcase className="text-purple-500" size={24} />
-              <h3 className="text-2xl font-bold">Training & Experience</h3>
+              <Briefcase className="text-purple-500" size={28} />
+              <h3 className="text-3xl font-bold">Training & Experience</h3>
             </div>
 
             <div className="space-y-6">
@@ -76,12 +78,12 @@ const Resume = ({ darkMode }) => {
                     }`}
                 >
                   <div className="absolute left-0 top-8 w-1 h-12 bg-purple-500 rounded-r-lg" />
-                  <h4 className="text-xl font-bold">{exp.role}</h4>
-                  <p className="text-purple-500 font-medium mb-1">{exp.company}</p>
-                  <span className={`text-xs px-2 py-1 rounded full ${darkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-500"}`}>
+                  <h4 className="text-2xl font-bold">{exp.role}</h4>
+                  <p className="text-purple-500 font-medium text-lg mb-1">{exp.company}</p>
+                  <span className={`text-sm px-3 py-1 rounded-full ${darkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-500"}`}>
                     {exp.duration}
                   </span>
-                  <p className={`mt-3 text-sm leading-relaxed ${darkMode ? "text-slate-400" : "text-slate-600"}`}>
+                  <p className={`mt-3 text-base leading-relaxed ${darkMode ? "text-slate-400" : "text-slate-600"}`}>
                     {exp.desc}
                   </p>
                 </motion.div>
@@ -92,8 +94,8 @@ const Resume = ({ darkMode }) => {
           {/* Education */}
           <div className="space-y-8">
             <div className="flex items-center gap-3 mb-2">
-              <GraduationCap className="text-blue-500" size={24} />
-              <h3 className="text-2xl font-bold">Education</h3>
+              <GraduationCap className="text-blue-500" size={28} />
+              <h3 className="text-3xl font-bold">Education</h3>
             </div>
 
             <div className="space-y-6">
@@ -107,10 +109,10 @@ const Resume = ({ darkMode }) => {
                     }`}
                 >
                   <div className="absolute left-0 top-8 w-1 h-12 bg-blue-500 rounded-r-lg" />
-                  <h4 className="text-xl font-bold">{edu.degree}</h4>
-                  <p className="text-blue-500 font-medium mb-1">{edu.school}</p>
+                  <h4 className="text-2xl font-bold">{edu.degree}</h4>
+                  <p className="text-blue-500 font-medium text-lg mb-1">{edu.school}</p>
                   <div className="flex justify-between items-center text-sm">
-                    <span className={`px-2 py-1 rounded ${darkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-500"}`}>
+                    <span className={`px-3 py-1 rounded-full ${darkMode ? "bg-slate-800 text-slate-400" : "bg-slate-100 text-slate-500"}`}>
                       {edu.year}
                     </span>
                   </div>

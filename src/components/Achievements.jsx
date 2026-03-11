@@ -1,6 +1,7 @@
 import React from "react";
 import { Award, Star } from "lucide-react";
 import { motion } from "framer-motion";
+import BackgroundEffects from "./BackgroundEffects";
 
 const Achievements = ({ darkMode }) => {
     const achievements = [
@@ -34,13 +35,14 @@ const Achievements = ({ darkMode }) => {
     return (
         <section
             id="achievements"
-            className={`py-20 px-4 transition-colors duration-300 ${darkMode ? "bg-slate-800/50 text-slate-100" : "bg-slate-50 text-slate-800"
+            className={`relative overflow-hidden py-20 px-4 transition-colors duration-300 ${darkMode ? "bg-transparent text-slate-100" : "bg-slate-50 text-slate-800"
                 }`}
         >
-            <div className="max-w-4xl mx-auto">
+            <BackgroundEffects variant="achievements" />
+            <div className="relative max-w-4xl mx-auto z-10">
                 <div className="flex items-center gap-3 mb-10">
-                    <Award className="text-yellow-500" size={32} />
-                    <h2 className="text-3xl font-extrabold tracking-tight">Achievements</h2>
+                    <Award className="text-yellow-500" size={36} />
+                    <h2 className="text-4xl md:text-5xl font-extrabold tracking-tight">Achievements</h2>
                 </div>
 
                 <div className="grid md:grid-cols-2 gap-6">
@@ -58,8 +60,8 @@ const Achievements = ({ darkMode }) => {
                                 {ach.icon}
                             </div>
                             <div>
-                                <h3 className="font-bold text-xl leading-snug mb-2">{ach.title}</h3>
-                                <p className={`text-sm leading-relaxed ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{ach.desc}</p>
+                                <h3 className="font-bold text-2xl leading-snug mb-2">{ach.title}</h3>
+                                <p className={`text-base leading-relaxed ${darkMode ? "text-slate-400" : "text-slate-500"}`}>{ach.desc}</p>
                             </div>
                         </motion.div>
                     ))}

@@ -1,6 +1,7 @@
 import React from "react";
 import { ExternalLink } from "lucide-react";
 import { motion } from "framer-motion";
+import BackgroundEffects from "./BackgroundEffects";
 
 // Safe image imports
 import recipeImg from "../assets/recipe.png";
@@ -35,29 +36,17 @@ const Projects = ({ darkMode }) => {
   return (
     <section
       id="projects"
-      className={`relative py-20 px-4 transition-colors duration-300 overflow-hidden ${darkMode ? "bg-slate-900 text-slate-100" : "bg-slate-50 text-slate-900"
+      className={`relative py-20 px-4 transition-colors duration-300 overflow-hidden ${darkMode ? "bg-transparent text-slate-100" : "bg-slate-50 text-slate-900"
         }`}
     >
-      {/* Interactive Background Elements */}
-      <div className="absolute inset-0 pointer-events-none">
-        <motion.div
-          animate={{ x: [0, -50, 0], y: [0, 50, 0] }}
-          transition={{ duration: 12, repeat: Infinity, ease: "linear" }}
-          className={`absolute top-40 right-20 w-72 h-72 rounded-full blur-[120px] opacity-20 ${darkMode ? "bg-blue-600" : "bg-blue-400"}`}
-        />
-        <motion.div
-          animate={{ x: [0, 50, 0], y: [0, -50, 0] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
-          className={`absolute bottom-40 left-20 w-72 h-72 rounded-full blur-[120px] opacity-20 ${darkMode ? "bg-purple-600" : "bg-purple-400"}`}
-        />
-      </div>
+      <BackgroundEffects variant="projects" />
 
       <div className="relative max-w-7xl mx-auto z-10">
         <motion.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          className="text-3xl md:text-4xl font-bold mb-12 text-center"
+          className="text-4xl md:text-5xl font-bold mb-12 text-center"
         >
           Featured Projects
         </motion.h2>
@@ -72,8 +61,8 @@ const Projects = ({ darkMode }) => {
               transition={{ delay: i * 0.1 }}
               whileHover={{ scale: 1.02 }}
               className={`glass-card group rounded-3xl overflow-hidden relative transition-all duration-500 hover:-translate-y-2 cursor-pointer ${darkMode
-                ? "bg-slate-900/50"
-                : "bg-white/60"
+                ? "bg-white/5 backdrop-blur-md border hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]"
+                : "bg-white/60 backdrop-blur-md border hover:border-blue-500/50 hover:shadow-[0_0_20px_rgba(59,130,246,0.2)]"
                 }`}
             >
               {/* Image Container */}
@@ -89,10 +78,10 @@ const Projects = ({ darkMode }) => {
 
               {/* Content */}
               <div className="p-6 space-y-4">
-                <h3 className="text-xl font-bold group-hover:text-blue-600 transition-colors">
+                <h3 className="text-2xl font-bold group-hover:text-blue-400 transition-colors">
                   {p.title}
                 </h3>
-                <p className={`text-sm line-clamp-3 ${darkMode ? "text-slate-400" : "text-slate-600"}`}>
+                <p className={`text-base line-clamp-3 ${darkMode ? "text-slate-300" : "text-slate-600"}`}>
                   {p.desc}
                 </p>
 
@@ -101,8 +90,8 @@ const Projects = ({ darkMode }) => {
                   {p.tags.map((tag) => (
                     <span
                       key={tag}
-                      className={`text-xs px-3 py-1.5 rounded-full font-medium transition-colors ${darkMode
-                        ? "bg-blue-500/10 text-blue-400 border border-blue-500/20 group-hover:bg-blue-500/20"
+                      className={`text-sm px-3 py-1.5 rounded-full font-medium transition-colors ${darkMode
+                        ? "bg-blue-500/10 text-cyan-300 border border-blue-500/20 group-hover:bg-blue-500/20"
                         : "bg-blue-50 text-blue-600 border border-blue-100 group-hover:bg-blue-100"
                         }`}
                     >
@@ -116,9 +105,9 @@ const Projects = ({ darkMode }) => {
                   href={p.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-blue-600 hover:text-blue-500 mt-2"
+                  className="inline-flex items-center gap-2 text-base font-semibold text-cyan-400 hover:text-cyan-300 mt-2"
                 >
-                  View Project <ExternalLink size={16} />
+                  View Project <ExternalLink size={18} />
                 </a>
               </div>
             </motion.div>

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowRight } from "lucide-react";
+import { FaJava, FaReact, FaNodeJs, FaPhp } from "react-icons/fa";
+import { SiMysql, SiTailwindcss, SiMongodb } from "react-icons/si";
 import CodeCard from './CodeCard';
-import profilePic from '../assets/profile_img.png';
+import BackgroundEffects from "./BackgroundEffects";
 
 const Hero = ({ darkMode, scrollTo }) => {
   const [text, setText] = useState('');
@@ -14,6 +16,16 @@ const Hero = ({ darkMode, scrollTo }) => {
     "DevOps Enthusiast",
     "PHP Developer",
     "Problem Solver"
+  ];
+
+  const coreSkills = [
+    { icon: <FaReact className="text-[#61DAFB]" />, name: 'React' },
+    { icon: <FaNodeJs className="text-[#339933]" />, name: 'Node.js' },
+    { icon: <FaJava className="text-[#EA2D2E]" />, name: 'Java' },
+    { icon: <FaPhp className="text-[#777BB4]" />, name: 'PHP' },
+    { icon: <SiMysql className="text-[#4479A1]" />, name: 'MySQL' },
+    { icon: <SiMongodb className="text-[#47A248]" />, name: 'MongoDB' },
+    { icon: <SiTailwindcss className="text-[#06B6D4]" />, name: 'Tailwind' },
   ];
 
   useEffect(() => {
@@ -40,16 +52,12 @@ const Hero = ({ darkMode, scrollTo }) => {
     <section
       id="home"
       className={`relative pt-32 pb-20 px-4 md:px-8 overflow-hidden flex items-center min-h-screen transition-colors duration-300 ${darkMode
-        ? "bg-slate-900 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"
+        ? "bg-slate-950 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:14px_24px]"
         : "bg-slate-50 bg-[radial-gradient(#cbd5e1_1px,transparent_1px)] [background-size:20px_20px]"
         }`}
     >
       {/* Background Effects */}
-      <div className="absolute inset-0 w-full h-full overflow-hidden pointer-events-none">
-        {/* Gradients */}
-        <div className={`absolute top-1/4 left-1/4 w-[400px] h-[400px] rounded-full blur-[120px] opacity-30 animate-pulse ${darkMode ? "bg-blue-600" : "bg-blue-300"}`} />
-        <div className={`absolute bottom-1/4 right-1/4 w-[400px] h-[400px] rounded-full blur-[120px] opacity-30 animate-pulse delay-1000 ${darkMode ? "bg-purple-600" : "bg-purple-300"}`} />
-      </div>
+      <BackgroundEffects variant="hero" />
 
       <div className="relative max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 lg:gap-8 items-center z-10 w-full">
 
@@ -58,30 +66,17 @@ const Hero = ({ darkMode, scrollTo }) => {
           initial={{ x: -50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.8 }}
-          className="text-center lg:text-left space-y-8 order-2 lg:order-1 mt-8 lg:mt-0"
+          className="text-center lg:text-left space-y-8 mt-8 lg:mt-0"
         >
           <div className="space-y-4">
-            <h2 className={`text-xl md:text-2xl font-medium tracking-wide text-[#3B82F6]`}>
+            <h2 className={`text-xl md:text-2xl font-medium tracking-wide text-blue-400 drop-shadow-sm`}>
               Welcome to my portfolio
             </h2>
             <div className="flex flex-col lg:flex-row items-center lg:items-end gap-6 lg:gap-8">
-              <motion.div
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ duration: 0.5, delay: 0.2 }}
-                className="relative shrink-0"
-              >
-                <div className="absolute -inset-1 rounded-full bg-gradient-to-r from-blue-500 to-purple-500 blur opacity-50"></div>
-                <img
-                  src={profilePic}
-                  alt="Prince Kumar"
-                  className={`relative w-24 h-24 md:w-32 md:h-32 object-cover rounded-full border-4 shadow-xl ${darkMode ? 'border-slate-800' : 'border-white'}`}
-                />
-              </motion.div>
               <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight">
                 Hi, I'm{" "}
                 <br className="hidden lg:block" />
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-500 via-purple-500 to-indigo-500 animate-gradient-x">
+                <span className="bg-clip-text text-transparent bg-gradient-to-r from-purple-700 to-blue-400">
                   Prince Kumar
                 </span>
               </h1>
@@ -91,7 +86,7 @@ const Hero = ({ darkMode, scrollTo }) => {
           <div className="h-10 md:h-12 flex items-center justify-center lg:justify-start overflow-hidden">
             <span className={`text-2xl md:text-4xl font-bold ${darkMode ? "text-slate-300" : "text-slate-700"}`}>
               {text}
-              <span className="animate-pulse text-purple-500">|</span>
+              <span className="animate-pulse text-purple-600 ml-1">|</span>
             </span>
           </div>
 
@@ -101,22 +96,57 @@ const Hero = ({ darkMode, scrollTo }) => {
 
           {/* Buttons */}
           <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4 pt-4">
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => scrollTo && scrollTo("projects")}
-              className="w-full sm:w-auto group relative px-8 py-4 rounded-full font-bold text-base text-white bg-[#3B82F6] overflow-hidden shadow-lg hover:shadow-[0_0_15px_rgba(59,130,246,0.6)] transition-all hover:-translate-y-1"
+              className="w-full sm:w-auto group relative px-8 py-4 rounded-full font-bold text-base text-white bg-gradient-to-r from-purple-700 to-blue-500 overflow-hidden shadow-lg hover:shadow-xl transition-all border border-purple-500"
             >
               <span className="relative z-10 flex items-center justify-center gap-2">
                 View Work <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" />
               </span>
-            </button>
+            </motion.button>
 
-            <button
+            <motion.button
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
               onClick={() => scrollTo && scrollTo("contact")}
-              className={`w-full sm:w-auto px-8 py-4 rounded-full font-bold text-base border transition-all hover:-translate-y-1 hover:shadow-lg bg-transparent border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6]/10`}
+              className={`w-full sm:w-auto px-8 py-4 rounded-full font-bold text-base border-2 transition-all bg-transparent border-purple-600 text-purple-600 dark:text-purple-400 hover:bg-purple-600 hover:text-white dark:hover:bg-purple-600/20`}
             >
               Contact Me
-            </button>
+            </motion.button>
           </div>
+
+          {/* Top Skills / Domains */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            className="pt-8 flex flex-col items-center lg:items-start gap-4"
+          >
+            <span className={`text-sm font-semibold uppercase tracking-wider ${darkMode ? "text-purple-400" : "text-purple-700"}`}>
+              Core Skills
+            </span>
+            <div className="flex flex-wrap justify-center lg:justify-start gap-3">
+              {coreSkills.map((skill, index) => (
+                <motion.div
+                  key={skill.name}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  whileTap={{ scale: 0.95 }}
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.5 + index * 0.1, type: "spring", stiffness: 200 }}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-full border ${darkMode
+                    ? "bg-slate-900 border-purple-600 hover:border-blue-400 hover:bg-slate-800 text-slate-200"
+                    : "bg-white border-purple-300 hover:border-blue-500 hover:bg-slate-50 text-slate-700"
+                    } transition-all cursor-pointer shadow-sm hover:shadow-md`}
+                >
+                  <span className="text-xl">{skill.icon}</span>
+                  <span className="font-medium text-sm">{skill.name}</span>
+                </motion.div>
+              ))}
+            </div>
+          </motion.div>
         </motion.div>
 
         {/* Right Column: Code Card Profile */}
@@ -124,14 +154,14 @@ const Hero = ({ darkMode, scrollTo }) => {
           initial={{ x: 50, opacity: 0 }}
           animate={{ x: 0, opacity: 1 }}
           transition={{ duration: 0.8, delay: 0.2 }}
-          className="relative w-full max-w-[500px] mx-auto order-1 lg:order-2 perspective-1000 z-20 group"
+          className="relative w-full max-w-[500px] mx-auto perspective-1000 z-20 group"
         >
-          {/* Decorative Elements around card */}
-          <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-500/10 rounded-full blur-2xl animate-pulse" />
-          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-500/10 rounded-full blur-2xl animate-pulse delay-700" />
+          {/* Decorative Elements around card - No Blur, Sharp Edges */}
+          <div className="absolute -top-10 -right-10 w-32 h-32 bg-blue-400/10 border-2 border-blue-400/20 rounded-full animate-pulse" />
+          <div className="absolute -bottom-10 -left-10 w-32 h-32 bg-purple-600/10 border-2 border-purple-600/20 rounded-full animate-pulse delay-700" />
 
-          {/* Aesthetic Glow Behind CodeCard */}
-          <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 blur-lg opacity-40 group-hover:opacity-75 transition duration-500" />
+          {/* Clean gradient background for codecard */}
+          <div className="absolute -inset-1 rounded-2xl bg-gradient-to-r from-purple-700 to-blue-500 opacity-20 group-hover:opacity-40 transition duration-500" />
 
           {/* Tilting container effect */}
           <div className="relative z-10 transform transition-transform duration-500 md:group-hover:-translate-y-2 md:group-hover:rotate-1">

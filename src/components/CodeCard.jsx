@@ -16,9 +16,9 @@ const CodeCard = () => {
             </div>
 
             {/* Code Content */}
-            <div className="p-6 md:p-8 text-slate-300 leading-relaxed overflow-x-auto selection:bg-purple-500/30">
+            <div className="p-6 md:p-8 text-slate-300 leading-relaxed overflow-x-auto selection:bg-cyan-500/30">
                 <div>
-                    <span className="text-[#ff79c6]">class</span> <span className="text-[#3B82F6]">SoftwareEngineer</span> {'{'}
+                    <span className="text-cyan-400">class</span> <span className="text-blue-400">SoftwareEngineer</span> {'{'}
                 </div>
 
                 <div className="pl-6 md:pl-8 mt-2 text-[#6272a4] italic">
@@ -26,31 +26,31 @@ const CodeCard = () => {
                 </div>
 
                 <div className="pl-6 md:pl-8 mt-2">
-                    <span className="text-[#3B82F6]">constructor</span>() {'{'}
+                    <span className="text-blue-400">constructor</span>() {'{'}
                 </div>
                 <div className="pl-12 md:pl-16">
-                    <span className="text-[#ff79c6]">this</span>.<span className="text-[#f1fa8c]">skills</span> <span className="text-[#ff79c6]">=</span> [
-                    <span className="text-[#50fa7b]">'MERN'</span>, <span className="text-[#50fa7b]">'PHP'</span>, <span className="text-[#50fa7b]">'DevOps'</span>
+                    <span className="text-cyan-400">this</span>.<span className="text-[#f1fa8c]">skills</span> <span className="text-cyan-400">=</span> [
+                    <span className="text-emerald-400">'MERN'</span>, <span className="text-emerald-400">'PHP'</span>, <span className="text-emerald-400">'DevOps'</span>
                     ];
                 </div>
                 <div className="pl-12 md:pl-16">
-                    <span className="text-[#ff79c6]">this</span>.<span className="text-[#f1fa8c]">philosophy</span> <span className="text-[#ff79c6]">=</span> <span className="text-[#50fa7b]">'CleanCode'</span>;
+                    <span className="text-cyan-400">this</span>.<span className="text-[#f1fa8c]">philosophy</span> <span className="text-cyan-400">=</span> <span className="text-emerald-400">'CleanCode'</span>;
                 </div>
                 <div className="pl-6 md:pl-8 mt-1">
                     {'}'}
                 </div>
 
                 <div className="pl-6 md:pl-8 mt-4">
-                    <span className="text-[#3B82F6]">solve</span>(<span className="text-white">complexProblem</span>) {'{'}
+                    <span className="text-blue-400">solve</span>(<span className="text-white">complexProblem</span>) {'{'}
                 </div>
                 <div className="pl-12 md:pl-16">
-                    <span className="text-[#ff79c6]">return</span> <span className="text-[#ff79c6]">this</span>.<span className="text-[#3B82F6]">architect</span>(<span className="text-white">complexProblem</span>)
+                    <span className="text-cyan-400">return</span> <span className="text-cyan-400">this</span>.<span className="text-blue-400">architect</span>(<span className="text-white">complexProblem</span>)
                 </div>
                 <div className="pl-16 md:pl-20 mt-1">
-                    .<span className="text-[#3B82F6]">optimize</span>()
+                    .<span className="text-blue-400">optimize</span>()
                 </div>
                 <div className="pl-16 md:pl-20 mt-1">
-                    .<span className="text-[#3B82F6]">ship</span>();
+                    .<span className="text-blue-400">ship</span>();
                 </div>
                 <div className="pl-6 md:pl-8 mt-1">
                     {'}'}
