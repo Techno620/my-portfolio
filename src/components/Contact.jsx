@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import MagneticButton from "./common/MagneticButton";
 
-const ContactCard = ({ icon: Icon, title, value, href, delay }) => {
+const ContactCard = ({ icon: Icon, title, value, href, delay, toneClass }) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = (e) => {
@@ -30,29 +30,37 @@ const ContactCard = ({ icon: Icon, title, value, href, delay }) => {
       transition={{ delay, duration: 0.5 }}
       className="group relative"
     >
-      <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-surface/40 to-highlight/10 border-2 border-white/10 hover:border-primary/40 hover:shadow-[0_0_50px_rgb(99_102_241_/_0.12)] transition-all duration-300 backdrop-blur-sm">
-        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:from-primary/30 transition-colors">
-          <Icon size={20} />
-        </div>
-
-        <div className="flex-1 min-w-0">
-          <p className="text-slate-500 font-mono text-[10px] font-bold uppercase tracking-[0.2em] mb-0.5">{title}</p>
-          <a 
-            href={href} 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="text-foreground font-heading font-medium group-hover:text-primary transition-colors block truncate"
-          >
-            {value}
-          </a>
-        </div>
-
-        <button 
-          onClick={handleCopy}
-          className="p-2.5 rounded-lg hover:bg-primary/10 text-slate-500 hover:text-primary transition-all shrink-0"
+      <div className="p-[2px] rounded-2xl bg-gradient-to-r from-white/10 via-white/5 to-white/10 group-hover:from-primary/35 group-hover:via-highlight/20 group-hover:to-secondary/25 transition-all duration-300">
+        <div
+          className={`flex items-center gap-4 p-5 rounded-2xl border-2 border-white/10 backdrop-blur-md transition-all duration-300 bg-gradient-to-br ${toneClass}`}
         >
-          {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
-        </button>
+          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white/80 border-2 border-white/10 group-hover:border-white/20 group-hover:text-white transition-colors shadow-[0_0_30px_rgb(255_255_255_/_0.04)]">
+            <Icon size={20} />
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <p className="text-slate-400 font-mono text-[10px] font-black uppercase tracking-[0.22em] mb-0.5">
+              {title}
+            </p>
+            <a
+              href={href}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-foreground font-heading font-semibold group-hover:text-white transition-colors block truncate"
+            >
+              {value}
+            </a>
+          </div>
+
+          <button
+            onClick={handleCopy}
+            className="p-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all shrink-0 border-2 border-transparent hover:border-white/10"
+            aria-label={`Copy ${title}`}
+            title="Copy"
+          >
+            {copied ? <Check size={14} className="text-success" /> : <Copy size={14} />}
+          </button>
+        </div>
       </div>
     </motion.div>
   );
@@ -75,16 +83,16 @@ const FloatingInput = ({ label, name, type = "text", value, onChange, required =
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         rows={isTextArea ? 4 : undefined}
-        className={`w-full px-6 py-4 bg-surface/20 border rounded-2xl text-foreground outline-none transition-all duration-300 font-sans text-sm backdrop-blur-md
-          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgb(56_189_248_/_0.05)]" : "border-white/5 hover:border-white/10"}
+        className={`w-full px-6 py-4 bg-surface/20 border-2 rounded-2xl text-foreground outline-none transition-all duration-200 font-sans text-sm font-semibold backdrop-blur-md
+          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgb(59_130_246_/_0.10)]" : "border-white/10 hover:border-white/20"}
           ${isTextArea ? "resize-none min-h-[150px]" : ""}
         `}
       />
       <label
         className={`absolute left-6 transition-all duration-300 pointer-events-none font-mono tracking-widest
           ${(isFocused || hasValue)
-            ? "-top-2.5 left-4 px-2 py-0.5 text-[10px] text-primary bg-surface border border-primary/20 rounded-lg font-bold"
-            : "top-4 text-xs text-slate-500"
+            ? "-top-2.5 left-4 px-2 py-0.5 text-[10px] text-primary bg-surface border-2 border-primary/20 rounded-lg font-black"
+            : "top-4 text-xs text-slate-500 font-black"
           }
         `}
       >
@@ -151,15 +159,33 @@ const Contact = () => {
 
   return (
     <section className="section relative overflow-hidden bg-transparent">
-      {/* Subtle Background Elements */}
+      {/* Animated Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-grid opacity-[0.05]" />
-        <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]" />
-        <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px]" />
-        <div className="absolute top-[30%] left-[15%] w-[35%] h-[35%] bg-highlight/5 rounded-full blur-[120px]" />
+        <div className="absolute inset-0 bg-grid opacity-[0.06]" />
+        <motion.div
+          aria-hidden="true"
+          className="absolute -top-[18%] -right-[14%] w-[46%] h-[46%] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle at 30% 30%, rgba(59,130,246,0.22), transparent 60%)" }}
+          animate={{ y: [0, 18, 0], x: [0, -10, 0] }}
+          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          aria-hidden="true"
+          className="absolute -bottom-[18%] -left-[14%] w-[46%] h-[46%] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle at 30% 30%, rgba(34,197,94,0.18), transparent 60%)" }}
+          animate={{ y: [0, -14, 0], x: [0, 10, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          aria-hidden="true"
+          className="absolute top-[22%] left-[18%] w-[40%] h-[40%] rounded-full blur-[120px]"
+          style={{ background: "radial-gradient(circle at 30% 30%, rgba(236,72,153,0.16), transparent 60%)" }}
+          animate={{ y: [0, 12, 0], x: [0, 12, 0] }}
+          transition={{ duration: 11, repeat: Infinity, ease: "easeInOut" }}
+        />
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container mx-auto px-4 sm:px-6 relative z-10">
         <div className="max-w-3xl mx-auto mb-20 text-center space-y-4">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
@@ -191,7 +217,7 @@ const Contact = () => {
           </motion.p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-12 lg:gap-14 items-start max-w-6xl mx-auto">
           {/* Left: Contact Info */}
           <div className="space-y-6">
             <ContactCard 
@@ -199,28 +225,32 @@ const Contact = () => {
               title="Email Address" 
               value="princekumar09372@gmail.com" 
               href="mailto:princekumar09372@gmail.com" 
-              delay={0.2} 
+              delay={0.2}
+              toneClass="from-blue-500/10 via-surface/35 to-primary/10"
             />
             <ContactCard 
               icon={Github} 
               title="GitHub Profile" 
               value="github.com/prince093kumar" 
               href="https://github.com/prince093kumar" 
-              delay={0.3} 
+              delay={0.3}
+              toneClass="from-violet-500/10 via-surface/35 to-fuchsia-500/10"
             />
             <ContactCard 
               icon={Linkedin} 
               title="LinkedIn Network" 
               value="linkedin.com/in/prince093kumar" 
               href="https://linkedin.com/in/prince093kumar" 
-              delay={0.4} 
+              delay={0.4}
+              toneClass="from-sky-500/10 via-surface/35 to-blue-500/10"
             />
             <ContactCard 
               icon={MapPin} 
               title="Current Location" 
               value="Punjab, India" 
               href="#" 
-              delay={0.5} 
+              delay={0.5}
+              toneClass="from-emerald-500/10 via-surface/35 to-secondary/10"
             />
             
             <div className="pt-8 flex items-center gap-6">
@@ -234,7 +264,7 @@ const Contact = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            className="tech-card p-8 md:p-10 relative overflow-hidden bg-surface/30 backdrop-blur-xl"
+            className="tech-card border-2 p-8 md:p-10 relative overflow-hidden bg-surface/30 backdrop-blur-xl self-start"
           >
             <AnimatePresence mode="wait">
               {formStatus === "success" ? (
