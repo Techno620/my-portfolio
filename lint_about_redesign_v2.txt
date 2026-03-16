@@ -1,0 +1,6 @@
+﻿
+D:\B.Tech-5 semester\Devops\portfolio\my-portfolio\src\components\CodeCard.jsx
+  27:8  warning  React Hook useEffect has a missing dependency: 'fullText'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+Γ£û 1 problem (0 errors, 1 warning)
+

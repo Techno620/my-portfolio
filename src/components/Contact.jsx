@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Mail, 
@@ -11,6 +11,7 @@ import {
   Copy,
   Check
 } from "lucide-react";
+import MagneticButton from "./common/MagneticButton";
 
 const ContactCard = ({ icon: Icon, title, value, href, delay }) => {
   const [copied, setCopied] = useState(false);
@@ -29,8 +30,8 @@ const ContactCard = ({ icon: Icon, title, value, href, delay }) => {
       transition={{ delay, duration: 0.5 }}
       className="group relative"
     >
-      <div className="flex items-center gap-4 p-5 rounded-2xl bg-surface/40 border border-white/5 hover:border-primary/30 transition-all duration-300 backdrop-blur-sm">
-        <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center text-primary border border-primary/10 group-hover:bg-primary/10 transition-colors">
+      <div className="flex items-center gap-4 p-5 rounded-2xl bg-gradient-to-br from-primary/10 via-surface/40 to-highlight/10 border-2 border-white/10 hover:border-primary/40 hover:shadow-[0_0_50px_rgb(99_102_241_/_0.12)] transition-all duration-300 backdrop-blur-sm">
+        <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-primary/20 to-secondary/10 flex items-center justify-center text-primary border border-primary/20 group-hover:from-primary/30 transition-colors">
           <Icon size={20} />
         </div>
 
@@ -75,7 +76,7 @@ const FloatingInput = ({ label, name, type = "text", value, onChange, required =
         onBlur={() => setIsFocused(false)}
         rows={isTextArea ? 4 : undefined}
         className={`w-full px-6 py-4 bg-surface/20 border rounded-2xl text-foreground outline-none transition-all duration-300 font-sans text-sm backdrop-blur-md
-          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgba(56,189,248,0.05)]" : "border-white/5 hover:border-white/10"}
+          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgb(56_189_248_/_0.05)]" : "border-white/5 hover:border-white/10"}
           ${isTextArea ? "resize-none min-h-[150px]" : ""}
         `}
       />
@@ -94,12 +95,12 @@ const FloatingInput = ({ label, name, type = "text", value, onChange, required =
 };
 
 const Particle = ({ delay }) => {
-  const randomX = useMemo(() => Math.random() * 100 - 50, []);
-  const randomY = useMemo(() => -100 - Math.random() * 100, []);
-  const randomDuration = useMemo(() => 5 + Math.random() * 5, []);
-  const randomSize = useMemo(() => 2 + Math.random() * 2, []);
-  const randomLeft = useMemo(() => `${Math.random() * 100}%`, []);
-  const randomTop = useMemo(() => `${Math.random() * 100}%`, []);
+  const [randomX] = useState(() => Math.random() * 100 - 50);
+  const [randomY] = useState(() => -100 - Math.random() * 100);
+  const [randomDuration] = useState(() => 5 + Math.random() * 5);
+  const [randomSize] = useState(() => 2 + Math.random() * 2);
+  const [randomLeft] = useState(() => `${Math.random() * 100}%`);
+  const [randomTop] = useState(() => `${Math.random() * 100}%`);
   
   return (
     <motion.div
@@ -149,12 +150,13 @@ const Contact = () => {
   };
 
   return (
-    <section id="contact" className="section relative overflow-hidden bg-[#020617] py-24">
+    <section className="section relative overflow-hidden bg-transparent">
       {/* Subtle Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-grid opacity-[0.05]" />
         <div className="absolute -top-[10%] -right-[10%] w-[40%] h-[40%] bg-primary/5 rounded-full blur-[120px]" />
         <div className="absolute -bottom-[10%] -left-[10%] w-[40%] h-[40%] bg-secondary/5 rounded-full blur-[120px]" />
+        <div className="absolute top-[30%] left-[15%] w-[35%] h-[35%] bg-highlight/5 rounded-full blur-[120px]" />
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
@@ -243,7 +245,7 @@ const Contact = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="flex flex-col items-center justify-center py-12 text-center"
                 >
-                  <div className="w-20 h-20 rounded-3xl bg-success/10 flex items-center justify-center text-success border border-success/20 mb-8 font-bold shadow-[0_0_40px_rgba(34,197,94,0.1)] relative">
+                  <div className="w-20 h-20 rounded-3xl bg-success/10 flex items-center justify-center text-success border border-success/20 mb-8 font-bold shadow-[0_0_40px_rgb(34_197_94_/_0.1)] relative">
                     <CheckCircle2 size={40} />
                   </div>
                   <h3 className="text-2xl font-heading font-bold text-white mb-3">Message Sent!</h3>
@@ -265,12 +267,10 @@ const Contact = () => {
                   <FloatingInput label="Subject" name="subject" value={formData.subject} onChange={handleChange} />
                   <FloatingInput label="Your Message" name="message" value={formData.message} onChange={handleChange} isTextArea />
 
-                  <motion.button
+                  <MagneticButton
                     disabled={formStatus === "loading"}
                     type="submit"
-                    whileHover={{ scale: 1.01 }}
-                    whileTap={{ scale: 0.99 }}
-                    className="w-full py-5 rounded-2xl bg-primary text-white font-mono font-bold text-sm tracking-[0.2em] hover:bg-primary/90 transition-all flex items-center justify-center gap-3 relative overflow-hidden shadow-xl shadow-primary/10 group"
+                    className="w-full py-5 bg-gradient-to-r from-primary via-highlight to-secondary hover:brightness-110 shadow-[0_0_30px_rgb(99_102_241_/_0.22)]"
                   >
                     {formStatus === "loading" ? (
                       <div className="flex items-center gap-3">
@@ -283,7 +283,7 @@ const Contact = () => {
                         <Send size={18} className="group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                       </div>
                     )}
-                  </motion.button>
+                  </MagneticButton>
                 </motion.form>
               )}
             </AnimatePresence>

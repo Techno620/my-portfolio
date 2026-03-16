@@ -108,7 +108,7 @@ const Certifications = () => {
     };
 
     return (
-        <section id="certifications" className="section relative overflow-hidden bg-background py-16">
+        <section className="section relative overflow-hidden bg-transparent py-16">
             <div className="absolute inset-0 pointer-events-none z-0">
                 <div className="absolute inset-0 bg-grid opacity-30" />
             </div>
@@ -177,7 +177,7 @@ const Certifications = () => {
                                             className="w-full h-full object-cover transition-transform duration-700 group-hover/card:scale-105"
                                         />
                                         
-                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all duration-300 bg-background/60 backdrop-blur-sm">
+                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/card:opacity-100 transition-all duration-300 bg-transparent/60 backdrop-blur-sm">
                                             <div className="w-12 h-12 rounded-lg bg-primary text-white flex items-center justify-center transform scale-50 group-hover/card:scale-100 transition-transform duration-300">
                                                 <Eye size={24} />
                                             </div>
@@ -239,7 +239,7 @@ const Certifications = () => {
                             animate={{ scale: 1, opacity: 1, y: 0 }}
                             exit={{ scale: 0.95, opacity: 0, y: 10 }}
                             onClick={(e) => e.stopPropagation()}
-                            className="relative max-w-5xl w-full bg-background rounded-2xl overflow-hidden shadow-2xl border border-border"
+                            className="relative max-w-5xl w-full bg-transparent rounded-2xl overflow-hidden shadow-2xl border border-border"
                         >
                             <button 
                                 onClick={() => setSelectedImage(null)}
@@ -253,7 +253,7 @@ const Certifications = () => {
                                     <img 
                                         src={selectedImage.image} 
                                         alt={selectedImage.title}
-                                        className="w-full h-auto object-contain max-h-[70vh] rounded border border-white/10 shadow-[0_0_30px_rgba(56,189,248,0.1)]"
+                                        className="w-full h-auto object-contain max-h-[70vh] rounded border border-white/10 shadow-[0_0_30px_rgb(56_189_248_/_0.1)]"
                                     />
                                 </div>
                                 <div className="md:col-span-2 p-8 md:p-10 flex flex-col justify-center space-y-8">

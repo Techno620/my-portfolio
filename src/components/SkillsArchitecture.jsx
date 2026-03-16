@@ -1,243 +1,135 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   SiJavascript, SiMysql, SiReact, SiTailwindcss, SiHtml5, SiCss,
   SiNodedotjs, SiExpress, SiPhp, SiPostgresql, SiMongodb, SiGit, SiGithub, 
-  SiPostman, SiBootstrap, SiJsonwebtokens, SiCplusplus 
+  SiPostman, SiBootstrap, SiJsonwebtokens, SiCplusplus, SiTypescript, SiDocker
 } from 'react-icons/si';
-import { FaJava, FaCode, FaServer, FaDatabase, FaTools, FaBrain, FaShieldAlt, FaNetworkWired } from 'react-icons/fa';
-import { VscVscode } from 'react-icons/vsc';
+import { FaJava, FaCode, FaServer, FaDatabase, FaTools, FaBrain, FaShieldAlt } from 'react-icons/fa';
+import { fadeInUp, staggerContainer } from "../utils/animations";
 
-const architectureLayers = [
-  {
-    id: 'layer1',
-    title: 'Programming Languages',
-    color: '#fbbf24', // Yellow
-    icon: FaCode,
-    skills: [
-      { name: 'C++', icon: SiCplusplus, desc: 'High-performance systems and competitive programming.', context: 'Core Logic & Performance' },
-      { name: 'JavaScript', icon: SiJavascript, desc: 'Dynamic scripting for front-end and back-end environments.', context: 'Full-stack Development' },
-      { name: 'SQL', icon: SiMysql, desc: 'Querying and managing relational database systems.', context: 'Data Management' },
-      { name: 'Java', icon: FaJava, desc: 'Robust, object-oriented language for enterprise applications.', context: 'System Architecture' },
-    ]
-  },
-  {
-    id: 'layer2',
-    title: 'Frontend Layer',
-    color: '#3b82f6', // Blue
-    icon: SiReact,
-    skills: [
-      { name: 'HTML5', icon: SiHtml5, desc: 'Standard markup language for creating web pages.', context: 'Web Structure' },
-      { name: 'CSS3', icon: SiCss, desc: 'Design language for styling and animating web interfaces.', context: 'Visual Presentation' },
-      { name: 'Tailwind CSS', icon: SiTailwindcss, desc: 'Utility-first CSS framework for rapid UI development.', context: 'Modern Styling' },
-      { name: 'Bootstrap', icon: SiBootstrap, desc: 'CSS framework for responsive, mobile-first websites.', context: 'Rapid Prototyping' },
-      { name: 'React.js', icon: SiReact, desc: 'Library for building component-based user interfaces.', context: 'Client-side Logic' },
-    ]
-  },
-  {
-    id: 'layer3',
-    title: 'Backend Layer',
-    color: '#10b981', // Green
-    icon: FaServer,
-    skills: [
-      { name: 'Node.js', icon: SiNodedotjs, desc: 'JavaScript runtime for building scalable network apps.', context: 'Server-side Logic' },
-      { name: 'Express.js', icon: SiExpress, desc: 'Fast, minimalist web framework for Node.js.', context: 'API Development' },
-      { name: 'PHP', icon: SiPhp, desc: 'Server-side scripting language for dynamic web pages.', context: 'Backend Logic' },
-      { name: 'RESTful APIs', icon: FaNetworkWired, desc: 'Interface for communication between software systems.', context: 'Integrations' },
-      { name: 'Middleware', icon: FaShieldAlt, desc: 'Software that acts as a bridge between systems.', context: 'Data Flow Control' },
-      { name: 'JWT Auth', icon: SiJsonwebtokens, desc: 'Compact, URL-safe means of representing claims.', context: 'Security' },
-    ]
-  },
-  {
-    id: 'layer4',
-    title: 'Database Layer',
-    color: '#f97316', // Orange
-    icon: FaDatabase,
-    skills: [
-      { name: 'MongoDB', icon: SiMongodb, desc: 'NoSQL document-oriented database for modern apps.', context: 'Scalable Data' },
-      { name: 'MySQL', icon: SiMysql, desc: 'Widely used open-source relational database.', context: 'Structured Data' },
-      { name: 'PostgreSQL', icon: SiPostgresql, desc: 'Advanced open-source relational database.', context: 'Complex Queries' },
-    ]
-  },
-  {
-    id: 'layer5',
-    title: 'Tools & Platforms',
-    color: '#a855f7', // Purple
-    icon: FaTools,
-    skills: [
-      { name: 'Git', icon: SiGit, desc: 'Distributed version control system for source code.', context: 'Version Control' },
-      { name: 'GitHub', icon: SiGithub, desc: 'Platform for hosting and collaborating on code.', context: 'Collaboration' },
-      { name: 'Postman', icon: SiPostman, desc: 'API platform for developers to design and test APIs.', context: 'API Testing' },
-      { name: 'VS Code', icon: VscVscode, desc: 'High-performance source-code editor.', context: 'Development Environment' },
-    ]
-  },
-  {
-    id: 'layer6',
-    title: 'Core CS Concepts',
-    color: '#22d3ee', // Cyan
-    icon: FaBrain,
-    skills: [
-      { name: 'DSA', icon: FaBrain, desc: 'Fundamental study of organizing and managing data.', context: 'Problem Solving' },
-      { name: 'OOP', icon: FaBrain, desc: 'Programming paradigm based on "objects".', context: 'Structural Design' },
-      { name: 'DBMS', icon: FaDatabase, desc: 'Software system for managing databases.', context: 'Data Systems' },
-      { name: 'API Design', icon: FaNetworkWired, desc: 'Principles for designing high-quality APIs.', context: 'Architecture' },
-      { name: 'Debugging', icon: FaShieldAlt, desc: 'Identifying and resolving bugs in software.', context: 'Maintenance' },
-    ]
-  },
-];
+const SkillBadge = ({ icon: Icon, name, color, level }) => (
+  <motion.div 
+    whileHover={{ y: -5, scale: 1.02 }}
+    className="group relative flex items-center gap-4 p-4 rounded-2xl bg-white/5 border border-white/5 hover:border-primary/30 transition-all duration-300"
+  >
+    <div className="p-3 rounded-xl bg-white/5 group-hover:bg-primary/10 transition-colors">
+      <Icon size={24} style={{ color }} className="group-hover:scale-110 transition-transform" />
+    </div>
+    <div>
+      <h4 className="text-sm font-bold text-white/90 group-hover:text-white transition-colors uppercase tracking-wider">{name}</h4>
+      <div className="flex gap-1 mt-1">
+        {[1, 2, 3].map((i) => (
+          <div key={i} className={`h-1 w-4 rounded-full ${i <= level ? 'bg-primary' : 'bg-white/10'}`} />
+        ))}
+      </div>
+    </div>
+  </motion.div>
+);
 
 const SkillsArchitecture = () => {
-  const [selectedSkill, setSelectedSkill] = useState(null);
+  const categories = [
+    {
+      title: "Core Engineering",
+      icon: FaCode,
+      skills: [
+        { name: "C++", icon: SiCplusplus, color: "#00599C", level: 3 },
+        { name: "Java", icon: FaJava, color: "#007396", level: 2 },
+        { name: "DSA", icon: FaBrain, color: "#fbbf24", level: 3 },
+      ]
+    },
+    {
+      title: "Frontend Stack",
+      icon: SiReact,
+      skills: [
+        { name: "React.js", icon: SiReact, color: "#61DAFB", level: 3 },
+        { name: "TypeScript", icon: SiTypescript, color: "#3178C6", level: 2 },
+        { name: "Tailwind", icon: SiTailwindcss, color: "#06B6D4", level: 3 },
+      ]
+    },
+    {
+      title: "Backend & Cloud",
+      icon: FaServer,
+      skills: [
+        { name: "Node.js", icon: SiNodedotjs, color: "#339933", level: 3 },
+        { name: "Express", icon: SiExpress, color: "#ffffff", level: 3 },
+        { name: "Docker", icon: SiDocker, color: "#2496ED", level: 2 },
+      ]
+    },
+    {
+      title: "Database Systems",
+      icon: FaDatabase,
+      skills: [
+        { name: "MongoDB", icon: SiMongodb, color: "#47A248", level: 3 },
+        { name: "MySQL", icon: SiMysql, color: "#4479A1", level: 3 },
+        { name: "PostgreSQL", icon: SiPostgresql, color: "#336791", level: 2 },
+      ]
+    }
+  ];
 
   return (
-    <section id="skills" className="section relative py-20 bg-[#020617] overflow-hidden">
-      {/* Background Decor */}
-      <div className="absolute inset-0 bg-grid opacity-[0.05] pointer-events-none" />
-      
+    <section className="section relative bg-transparent py-24 overflow-hidden">
       <div className="container mx-auto px-6 relative z-10">
-        <div className="text-center mb-20">
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-extrabold text-white mb-4"
+        <div className="flex flex-col lg:flex-row gap-16">
+          
+          {/* Left: Branding */}
+          <motion.div 
+            variants={staggerContainer}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true }}
+            className="lg:w-1/3"
           >
-            System <span className="text-primary">Architecture</span>
-          </motion.h2>
-          <motion.p 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="text-slate-400 text-lg max-w-2xl mx-auto"
-          >
-            Structured full-stack pipeline representing Prince Kumar's technical ecosystem.
-          </motion.p>
-        </div>
+            <motion.div variants={fadeInUp} className="flex items-center gap-4 text-primary mb-6">
+              <span className="w-12 h-px bg-primary/50" />
+              <span className="font-mono text-xs font-bold uppercase tracking-[0.4em]">Tech.stack()</span>
+            </motion.div>
+            
+            <h2 className="text-5xl md:text-6xl font-heading font-black text-white tracking-tighter mb-8">
+              TECHNICAL <span className="text-primary">DNA</span>
+            </h2>
+            
+            <p className="text-lg text-muted-foreground font-medium leading-relaxed mb-10">
+              A meticulously curated stack focused on building resilient, high-performance web architectures.
+            </p>
 
-        <div className="flex flex-col items-center gap-4">
-          {architectureLayers.map((layer, index) => (
-            <React.Fragment key={layer.id}>
-              {/* Connection Line */}
-              {index !== 0 && (
-                <div className="h-12 w-1 bg-gradient-to-b from-transparent via-slate-700 to-transparent relative">
-                  <motion.div 
-                    animate={{ y: [0, 48] }}
-                    transition={{ duration: 2, repeat: Infinity, ease: 'linear' }}
-                    className="absolute top-0 left-0 w-full h-4 bg-primary blur-[2px]"
-                  />
+            <div className="p-6 rounded-3xl bg-primary/5 border border-primary/10 backdrop-blur-md">
+              <div className="flex items-center gap-4 mb-4">
+                <FaShieldAlt className="text-primary" size={24} />
+                <h4 className="text-white font-bold uppercase tracking-wider text-sm">Design Philosophy</h4>
+              </div>
+              <p className="text-xs text-muted-foreground leading-relaxed italic">
+                "Clean code is not just written; it's architected. I prioritize scalability, type safety, and efficient data flow in every system I build."
+              </p>
+            </div>
+          </motion.div>
+
+          {/* Right: Skill Grid */}
+          <div className="lg:w-2/3 grid grid-cols-1 md:grid-cols-2 gap-8">
+            {categories.map((cat, idx) => (
+              <motion.div 
+                key={idx}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className="space-y-6"
+              >
+                <div className="flex items-center gap-3 border-b border-white/5 pb-4">
+                  <cat.icon className="text-primary opacity-50" size={18} />
+                  <h3 className="text-xs font-mono font-bold text-white/40 uppercase tracking-[0.3em]">{cat.title}</h3>
                 </div>
-              )}
-
-              <div className="w-full">
-                <div className="flex items-center gap-3 mb-6">
-                  <div className="w-8 h-8 rounded-lg flex items-center justify-center bg-slate-800 border border-white/5">
-                    <layer.icon size={16} style={{ color: layer.color }} />
-                  </div>
-                  <h3 className="text-sm font-bold uppercase tracking-[0.2em] text-slate-400">
-                    {layer.title}
-                  </h3>
-                  <div className="flex-1 h-[1px] bg-gradient-to-r from-slate-800 to-transparent ml-4" />
-                </div>
-
-                <div className="flex flex-wrap justify-center gap-4 md:gap-6">
-                  {layer.skills.map((skill) => (
-                    <motion.button
-                      key={skill.name}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setSelectedSkill({ ...skill, category: layer.title, color: layer.color })}
-                      className="group relative px-6 py-4 rounded-2xl glass-card flex flex-col items-center gap-3 transition-all min-w-[120px]"
-                    >
-                      {/* Hover Glow */}
-                      <div 
-                        className="absolute inset-0 opacity-0 group-hover:opacity-10 transition-opacity rounded-2xl pointer-events-none"
-                        style={{ backgroundColor: layer.color, filter: 'blur(20px)' }}
-                      />
-                      
-                      <div className="p-3 rounded-xl bg-white/5 group-hover:bg-white/10 transition-colors">
-                        <skill.icon size={24} style={{ color: layer.color }} />
-                      </div>
-                      <span className="text-xs font-bold text-slate-300 group-hover:text-white transition-colors uppercase tracking-wider">
-                        {skill.name}
-                      </span>
-                    </motion.button>
+                <div className="grid grid-cols-1 gap-3">
+                  {cat.skills.map((skill, sIdx) => (
+                    <SkillBadge key={sIdx} {...skill} />
                   ))}
                 </div>
-              </div>
-            </React.Fragment>
-          ))}
+              </motion.div>
+            ))}
+          </div>
+
         </div>
       </div>
-
-      {/* Details Panel Overlay */}
-      <AnimatePresence>
-        {selectedSkill && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6 bg-black/60 backdrop-blur-sm"
-            onClick={() => setSelectedSkill(null)}
-          >
-            <motion.div
-              initial={{ scale: 0.9, opacity: 0, y: 20 }}
-              animate={{ scale: 1, opacity: 1, y: 0 }}
-              exit={{ scale: 0.9, opacity: 0, y: 20 }}
-              className="w-full max-w-lg glass-card p-10 rounded-[2.5rem] border-white/10 relative overflow-hidden"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {/* Corner Accent */}
-              <div 
-                className="absolute -top-24 -right-24 w-64 h-64 blur-[100px] opacity-20 pointer-events-none"
-                style={{ backgroundColor: selectedSkill.color }}
-              />
-
-              <div className="relative z-10">
-                <div className="flex items-start justify-between mb-8">
-                  <div className="flex items-center gap-6">
-                    <div className="p-5 rounded-2xl glass border border-white/5">
-                      <selectedSkill.icon size={48} style={{ color: selectedSkill.color }} />
-                    </div>
-                    <div>
-                      <h4 className="text-4xl font-black text-white mb-2">{selectedSkill.name}</h4>
-                      <span className="text-xs font-mono uppercase tracking-[0.3em]" style={{ color: selectedSkill.color }}>
-                        {selectedSkill.category}
-                      </span>
-                    </div>
-                  </div>
-                  <button 
-                    onClick={() => setSelectedSkill(null)}
-                    className="p-3 rounded-full glass hover:bg-white/10 transition-colors text-slate-400 hover:text-white"
-                  >
-                    &times;
-                  </button>
-                </div>
-
-                <div className="space-y-10">
-                  <div className="space-y-4">
-                    <h5 className="text-white font-bold flex items-center gap-2 text-sm uppercase tracking-widest">
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedSkill.color }} />
-                      Description
-                    </h5>
-                    <p className="text-slate-400 text-lg leading-relaxed italic">
-                      {selectedSkill.desc}
-                    </p>
-                  </div>
-
-                  <div className="space-y-4">
-                    <h5 className="text-white font-bold flex items-center gap-2 text-sm uppercase tracking-widest">
-                      <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: selectedSkill.color }} />
-                      Usage Context
-                    </h5>
-                    <div className="px-6 py-4 rounded-xl glass border border-white/5 text-slate-300 font-medium">
-                      {selectedSkill.context}
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </section>
   );
 };

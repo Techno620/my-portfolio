@@ -41,7 +41,7 @@ const Achievements = () => {
     ];
 
     return (
-        <section id="achievements" className="section relative">
+        <section className="section relative">
             <div className="container mx-auto px-6">
                 <div className="grid lg:grid-cols-2 gap-20">
                     
@@ -58,7 +58,7 @@ const Achievements = () => {
                             <motion.h2 
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                className="text-4xl md:text-5xl font-extrabold tracking-tight text-white"
+                                className="text-4xl md:text-5xl font-heading font-black tracking-tight text-white"
                             >
                                 System <span className="text-gradient">Milestones</span>
                             </motion.h2>
@@ -71,13 +71,13 @@ const Achievements = () => {
                                     initial={{ opacity: 0, scale: 0.95 }}
                                     whileInView={{ opacity: 1, scale: 1 }}
                                     transition={{ delay: i * 0.1 }}
-                                    className="p-6 glass-card rounded-3xl border border-white/5 hover:border-primary/30 transition-all group overflow-hidden relative"
+                                    className="p-6 glass-card rounded-2xl border border-white/5 hover:border-primary/30 transition-all group overflow-hidden relative"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity" />
                                     <div className="w-12 h-12 rounded-2xl bg-white/5 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all mb-4 relative z-10">
                                         {ach.icon}
                                     </div>
-                                    <h3 className="text-lg font-bold text-white mb-2 relative z-10 group-hover:text-primary transition-colors">{ach.title}</h3>
+                                    <h3 className="text-lg font-heading font-bold text-white mb-2 relative z-10 group-hover:text-primary transition-colors">{ach.title}</h3>
                                     <p className="text-muted-foreground text-xs leading-relaxed relative z-10">{ach.desc}</p>
                                 </motion.div>
                             ))}
@@ -97,9 +97,9 @@ const Achievements = () => {
                             <motion.h2 
                                 initial={{ opacity: 0, y: 20 }}
                                 whileInView={{ opacity: 1, y: 0 }}
-                                className="text-4xl md:text-5xl font-extrabold tracking-tight text-white"
+                                className="text-4xl md:text-5xl font-heading font-black tracking-tight text-white"
                             >
-                                Professional <span className="text-gradient">Evolution</span>
+                                Hands-on <span className="text-gradient">Training</span>
                             </motion.h2>
                         </div>
 
@@ -108,7 +108,7 @@ const Achievements = () => {
                                 key={i}
                                 initial={{ opacity: 0, x: 20 }}
                                 whileInView={{ opacity: 1, x: 0 }}
-                                className="glass-card p-10 rounded-[2.5rem] border-white/5 relative overflow-hidden group"
+                                className="glass-card p-10 rounded-2xl border-white/5 relative overflow-hidden group"
                             >
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-secondary/5 blur-3xl -z-10" />
                                 

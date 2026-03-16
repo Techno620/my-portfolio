@@ -1,6 +1,7 @@
 import React from "react";
 import { Download, Briefcase, GraduationCap, Calendar, Award } from "lucide-react";
 import { motion } from "framer-motion";
+import MagneticButton from "./common/MagneticButton";
 
 const Resume = () => {
   const experiences = [
@@ -35,7 +36,7 @@ const Resume = () => {
   ];
 
   return (
-    <section id="resume" className="section relative overflow-hidden bg-background">
+    <section className="section relative overflow-hidden bg-transparent">
       {/* Background Decor */}
       <div className="absolute inset-0 pointer-events-none z-0">
         <div className="absolute inset-0 bg-grid opacity-20" />
@@ -83,7 +84,7 @@ const Resume = () => {
                   className="relative"
                 >
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-background border-2 border-primary shadow-[0_0_10px_rgba(56,189,248,0.5)]" />
+                  <div className="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-transparent border-2 border-primary shadow-[0_0_10px_rgb(56_189_248_/_0.5)]" />
                   
                   <div className="tech-card p-6 md:p-8 hover:border-primary/30 group">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
@@ -137,7 +138,7 @@ const Resume = () => {
                   className="relative"
                 >
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-background border-2 border-secondary shadow-[0_0_10px_rgba(99,102,241,0.5)]" />
+                  <div className="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-transparent border-2 border-secondary shadow-[0_0_10px_rgb(99_102_241_/_0.5)]" />
                   
                   <div className="tech-card p-6 md:p-8 hover:border-secondary/30 group">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -174,16 +175,15 @@ const Resume = () => {
 
         {/* Action Button */}
         <div className="text-center mt-20">
-          <motion.a
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
+          <MagneticButton
+            as="a"
             href="/resume.pdf"
             download
-            className="inline-flex items-center gap-3 px-10 py-4 rounded-full bg-primary text-white font-mono font-bold uppercase tracking-widest hover:shadow-[0_0_30px_rgba(56,189,248,0.4)] transition-all"
+            className="px-10 py-4"
           >
             <Download size={20} />
             Download Resume
-          </motion.a>
+          </MagneticButton>
         </div>
       </div>
     </section>

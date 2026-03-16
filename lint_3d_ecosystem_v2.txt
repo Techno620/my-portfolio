@@ -1,0 +1,22 @@
+﻿
+D:\B.Tech-5 semester\Devops\portfolio\my-portfolio\src\components\CodingStats.jsx
+  68:16  error    'err' is defined but never used                                                                                                             no-unused-vars
+  77:6   warning  React Hook useEffect has missing dependencies: 'fallbackGithub' and 'fallbackLeetcode'. Either include them or remove the dependency array  react-hooks/exhaustive-deps
+
+D:\B.Tech-5 semester\Devops\portfolio\my-portfolio\src\components\TechOrbit.jsx
+   36:37  error  'index' is defined but never used. Allowed unused args must match /^[A-Z_]|motion/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         no-unused-vars
+   38:9   error  'scroll' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]|motion/u                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                               no-unused-vars
+  104:20  error  Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+  102 |         const x = Math.cos(angle) * radius;
+  103 |         const z = Math.sin(angle) * radius;
+> 104 |         const y = (Math.random() - 0.5) * 2;
+      |                    ^^^^^^^^^^^^^ Cannot call impure function
+  105 |         return <TechNode key={tech.name} tech={tech} position={[x, y, z]} index={i} />;
+  106 |       })}
+  107 |     </group>  react-hooks/purity
+
+Γ£û 5 problems (4 errors, 1 warning)
+

@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 import Navbar from './components/Navbar';
-import Hero from './components/Hero';
+import Hero from './components/Hero.tsx';
 import About from './components/About';
 import Projects from './components/Projects';
+import CodingStats from './components/CodingStats';
 import Resume from './components/Resume';
 import Certifications from './components/Certifications';
 import Achievements from './components/Achievements';
@@ -10,15 +12,26 @@ import Contact from './components/Contact';
 import Footer from './components/Footer';
 import BackgroundSystem from './components/common/BackgroundSystem';
 import SectionDivider from './components/common/SectionDivider';
-import SkillsArchitecture from './components/SkillsArchitecture';
-import Workflow from './components/Workflow';
+import SkillsSystemArchitecture from './components/SkillsSystemArchitecture';
+import { fadeInUp } from './utils/animations';
+
+const SectionWrapper = ({ children, id }) => (
+  <motion.div
+    id={id}
+    initial="hidden"
+    whileInView="visible"
+    viewport={{ once: true, amount: 0.15 }}
+    variants={fadeInUp}
+  >
+    {children}
+  </motion.div>
+);
 
 const App = () => {
-  const darkMode = true;
   const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
-    const sectionIds = ['home', 'about', 'skills', 'workflow', 'projects', 'resume', 'contact', 'certifications', 'achievements'];
+    const sectionIds = ['home', 'about', 'skills', 'projects', 'stats', 'resume', 'contact', 'certifications', 'achievements'];
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -51,35 +64,60 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen transition-colors duration-500 dark">
+    <div className="min-h-screen relative">
       <BackgroundSystem />
-      <Navbar
-        darkMode={darkMode}
-        scrollTo={scrollTo}
-        activeSection={activeSection}
-      />
 
-      <main className="relative z-0">
-        <Hero darkMode={darkMode} scrollTo={scrollTo} />
-        <SectionDivider />
-        <About darkMode={darkMode} />
-        <SectionDivider />
-        <SkillsArchitecture />
-        <SectionDivider />
-        <Workflow />
-        <SectionDivider />
-        <Projects darkMode={darkMode} />
-        <SectionDivider />
-        <Resume darkMode={darkMode} />
-        <SectionDivider />
-        <Certifications darkMode={darkMode} />
-        <SectionDivider />
-        <Achievements darkMode={darkMode} />
-        <SectionDivider />
-        <Contact darkMode={darkMode} />
-      </main>
+      <div className="relative z-10">
+        <Navbar scrollTo={scrollTo} activeSection={activeSection} />
 
-      <Footer darkMode={darkMode} />
+        <main>
+          <SectionWrapper id="home">
+            <Hero scrollTo={scrollTo} />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="about">
+            <About />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="skills">
+            <SkillsSystemArchitecture />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="projects">
+            <Projects />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="stats">
+            <CodingStats />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="resume">
+            <Resume />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="certifications">
+            <Certifications />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="achievements">
+            <Achievements />
+          </SectionWrapper>
+
+          <SectionDivider />
+          <SectionWrapper id="contact">
+            <Contact />
+          </SectionWrapper>
+
+          <Footer />
+        </main>
+      </div>
     </div>
   );
 };

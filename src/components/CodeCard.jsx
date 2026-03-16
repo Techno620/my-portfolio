@@ -1,67 +1,70 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
+import { motion } from 'framer-motion';
 
 const CodeCard = () => {
-    return (
-        <div className="w-full bedim-card bg-[#050510]/80 backdrop-blur-xl border border-[var(--glass-border)] hover:border-cyan-500/50 hover:shadow-[0_0_30px_rgba(34,211,238,0.2)] overflow-hidden font-mono text-sm md:text-base text-left group transition-all duration-300 rounded-xl relative">
-            {/* Glowing background layer */}
-            <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-cyan-500/10 pointer-events-none"></div>
+    const [text, setText] = useState("");
+    const fullText = `class SoftwareEngineer {
+  constructor() {
+    this.name = "Prince Kumar";
+    this.role = "Full Stack Developer";
+    this.specialties = [
+      "System Architecture",
+      "REST API Engineering",
+      "Frontend Engineering"
+    ];
+    this.philosophy = "Build systems that scale.";
+  }
+}`;
 
-            {/* Window Header */}
-            <div className="flex items-center px-4 py-3 border-b border-[var(--glass-border)] bg-[#030014]/80 relative z-10 shadow-sm">
-                <div className="flex space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-[#ff5f56] hover:scale-110 transition-transform"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#ffbd2e] hover:scale-110 transition-transform"></div>
-                    <div className="w-3 h-3 rounded-full bg-[#27c93f] hover:scale-110 transition-transform"></div>
+    useEffect(() => {
+        let i = 0;
+        const timer = setInterval(() => {
+            setText(fullText.slice(0, i));
+            i++;
+            if (i > fullText.length) clearInterval(timer);
+        }, 15);
+        return () => clearInterval(timer);
+    }, [fullText]);
+
+    const highlightCode = (code) => {
+        return code.split('\n').map((line, i) => {
+            // Very basic syntax highlighting for the demo
+            let formattedLine = line
+                .replace(/class|constructor|this|new/g, '<span class="text-pink-400">$&</span>')
+                .replace(/Prince Kumar|Full Stack Developer|System Architecture|REST API Engineering|Frontend Engineering|Build systems that scale./g, '<span class="text-emerald-400">"$&"</span>')
+                .replace(/name|role|specialties|philosophy/g, '<span class="text-cyan-400">$&</span>');
+            
+            return (
+                <div key={i} className="min-h-[1.5em] flex gap-4">
+                    <span className="text-white/10 w-4 text-right select-none">{i + 1}</span>
+                    <span dangerouslySetInnerHTML={{ __html: formattedLine }} />
                 </div>
-                <div className="mx-auto flex-1 text-center text-gray-400 text-xs font-semibold tracking-wider opacity-60 group-hover:opacity-100 transition-opacity">
+            );
+        });
+    };
+
+    return (
+        <div className="w-full glass-card border-white/5 bg-black/60 backdrop-blur-3xl overflow-hidden font-mono text-[13px] leading-relaxed group transition-all duration-500 hover:shadow-[0_0_50px_rgb(6_182_212_/_0.1)]">
+            {/* Header */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/5">
+                <div className="flex space-x-2">
+                    <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
+                    <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
+                    <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+                </div>
+                <div className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">
                     SoftwareEngineer.js
                 </div>
             </div>
 
-            {/* Code Content */}
-            <div className="p-6 md:p-8 text-gray-200 leading-relaxed overflow-x-auto selection:bg-cyan-500/30 relative z-10">
-                <div>
-                    <span className="text-pink-400">class</span> <span className="text-cyan-400 font-bold">SoftwareEngineer</span> {'{'}
-                </div>
-
-                <div className="pl-6 md:pl-8 mt-2 text-gray-500 italic">
-          // Engineering with a purpose 🚀
-                </div>
-
-                <div className="pl-6 md:pl-8 mt-2">
-                    <span className="text-[#3B82F6]">constructor</span>() {'{'}
-                </div>
-                <div className="pl-12 md:pl-16">
-                    <span className="text-[#ff79c6]">this</span>.<span className="text-[#f1fa8c]">skills</span> <span className="text-[#ff79c6]">=</span> [
-                    <span className="text-[#50fa7b]">'MERN'</span>, <span className="text-[#50fa7b]">'PHP'</span>, <span className="text-[#50fa7b]">'DevOps'</span>
-                    ];
-                </div>
-                <div className="pl-12 md:pl-16">
-                    <span className="text-[#ff79c6]">this</span>.<span className="text-[#f1fa8c]">philosophy</span> <span className="text-[#ff79c6]">=</span> <span className="text-[#50fa7b]">'CleanCode'</span>;
-                </div>
-                <div className="pl-6 md:pl-8 mt-1">
-                    {'}'}
-                </div>
-
-                <div className="pl-6 md:pl-8 mt-4">
-                    <span className="text-[#3B82F6]">solve</span>(<span className="text-white">complexProblem</span>) {'{'}
-                </div>
-                <div className="pl-12 md:pl-16">
-                    <span className="text-[#ff79c6]">return</span> <span className="text-[#ff79c6]">this</span>.<span className="text-[#3B82F6]">architect</span>(<span className="text-white">complexProblem</span>)
-                </div>
-                <div className="pl-16 md:pl-20 mt-1">
-                    .<span className="text-[#3B82F6]">optimize</span>()
-                </div>
-                <div className="pl-16 md:pl-20 mt-1">
-                    .<span className="text-[#3B82F6]">ship</span>();
-                </div>
-                <div className="pl-6 md:pl-8 mt-1">
-                    {'}'}
-                </div>
-
-                <div className="mt-2">
-                    {'}'}
-                </div>
+            {/* Content */}
+            <div className="p-8 text-slate-300">
+                {highlightCode(text)}
+                <motion.span 
+                    animate={{ opacity: [1, 0] }}
+                    transition={{ duration: 0.8, repeat: Infinity }}
+                    className="inline-block w-2 h-4 bg-primary ml-1"
+                />
             </div>
         </div>
     );
