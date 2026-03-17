@@ -1,145 +1,202 @@
-import React, { useEffect, useState } from 'react';
-import { motion } from 'framer-motion';
-import Particles, { initParticlesEngine } from "@tsparticles/react";
-import { loadFull } from "tsparticles";
+import React, { useEffect, useMemo, useRef } from "react";
+
+const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+
+const prefersReducedMotion = () =>
+  typeof window !== "undefined" &&
+  window.matchMedia &&
+  window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 const BackgroundSystem = () => {
-  const [init, setInit] = useState(false);
+  const rootRef = useRef(null);
+  const canvasRef = useRef(null);
+  const rafRef = useRef(null);
+
+  const palette = useMemo(
+    () => [
+      "rgba(255,255,255,0.85)",
+      "rgba(99,102,241,0.75)",
+      "rgba(236,72,153,0.65)",
+      "rgba(34,197,94,0.65)",
+    ],
+    []
+  );
 
   useEffect(() => {
-    initParticlesEngine(async (engine) => {
-      await loadFull(engine);
-    }).then(() => {
-      setInit(true);
-    });
-  }, []);
+    const root = rootRef.current;
+    const canvas = canvasRef.current;
+    if (!root || !canvas) return;
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    let width = 0;
+    let height = 0;
+    let dpr = 1;
+    const mouse = { x: 0, y: 0 };
+
+    const resize = () => {
+      const rect = root.getBoundingClientRect();
+      width = Math.max(1, Math.floor(rect.width));
+      height = Math.max(1, Math.floor(rect.height));
+      dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
+      canvas.width = Math.floor(width * dpr);
+      canvas.height = Math.floor(height * dpr);
+      canvas.style.width = `${width}px`;
+      canvas.style.height = `${height}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    };
+
+    const ro = new ResizeObserver(resize);
+    ro.observe(root);
+    resize();
+
+    const onMove = (e) => {
+      const nx = e.clientX / window.innerWidth - 0.5;
+      const ny = e.clientY / window.innerHeight - 0.5;
+      mouse.x = clamp(nx, -0.6, 0.6);
+      mouse.y = clamp(ny, -0.6, 0.6);
+    };
+    window.addEventListener("pointermove", onMove, { passive: true });
+
+    const makeParticles = () => {
+      // Scale particle count with area (kept intentionally low for perf)
+      const area = width * height;
+      const target = clamp(Math.round(area / 32000), 40, 90);
+      const particles = Array.from({ length: target }).map((_, i) => {
+        const speed = 0.08 + Math.random() * 0.22;
+        return {
+          x: Math.random() * width,
+          y: Math.random() * height,
+          vx: (Math.random() - 0.5) * speed,
+          vy: (Math.random() - 0.5) * speed,
+          r: 0.6 + Math.random() * 1.8,
+          c: palette[i % palette.length],
+          tw: Math.random() * Math.PI * 2,
+        };
+      });
+      return particles;
+    };
+
+    let particles = makeParticles();
+    const relinkDistance = 140;
+
+    const drawOnce = () => {
+      ctx.clearRect(0, 0, width, height);
+      const ox = mouse.x * 18;
+      const oy = mouse.y * 12;
+
+      // Lines
+      for (let i = 0; i < particles.length; i++) {
+        const a = particles[i];
+        for (let j = i + 1; j < particles.length; j++) {
+          const b = particles[j];
+          const dx = (b.x - a.x);
+          const dy = (b.y - a.y);
+          const dist = Math.hypot(dx, dy);
+          if (dist > relinkDistance) continue;
+          const alpha = (1 - dist / relinkDistance) * 0.06;
+          ctx.strokeStyle = `rgba(99,102,241,${alpha})`;
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.moveTo(a.x + ox, a.y + oy);
+          ctx.lineTo(b.x + ox, b.y + oy);
+          ctx.stroke();
+        }
+      }
+
+      // Dots
+      for (const p of particles) {
+        ctx.save();
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "rgba(99,102,241,0.18)";
+        ctx.fillStyle = p.c;
+        ctx.beginPath();
+        ctx.arc(p.x + ox, p.y + oy, p.r, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+    };
+
+    if (prefersReducedMotion()) {
+      drawOnce();
+      return () => {
+        window.removeEventListener("pointermove", onMove);
+        ro.disconnect();
+      };
+    }
+
+    let last = performance.now();
+    const step = (t) => {
+      const dt = Math.min(0.033, (t - last) / 1000);
+      last = t;
+
+      // Update particles
+      for (const p of particles) {
+        p.x += p.vx * 60 * dt;
+        p.y += p.vy * 60 * dt;
+        p.tw += 0.6 * dt;
+        // wrap
+        if (p.x < -20) p.x = width + 20;
+        if (p.x > width + 20) p.x = -20;
+        if (p.y < -20) p.y = height + 20;
+        if (p.y > height + 20) p.y = -20;
+        // subtle twinkle
+        p.r = clamp(p.r + Math.sin(p.tw) * 0.002, 0.6, 2.4);
+      }
+
+      // If resized significantly, rebuild
+      if (particles.length === 0) particles = makeParticles();
+
+      drawOnce();
+      rafRef.current = requestAnimationFrame(step);
+    };
+
+    rafRef.current = requestAnimationFrame(step);
+
+    return () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      window.removeEventListener("pointermove", onMove);
+      ro.disconnect();
+    };
+  }, [palette]);
 
   return (
     <div
+      ref={rootRef}
       className="fixed inset-0 z-0 overflow-hidden pointer-events-none"
       style={{
         background:
-          "radial-gradient(800px circle at 18% 12%, rgba(99,102,241,0.18), transparent 55%), radial-gradient(700px circle at 86% 62%, rgba(236,72,153,0.14), transparent 60%), radial-gradient(900px circle at 50% 92%, rgba(34,197,94,0.10), transparent 60%), linear-gradient(180deg, #020617 0%, #030712 100%)",
+          "radial-gradient(800px circle at 18% 12%, rgba(99,102,241,0.16), transparent 55%), radial-gradient(700px circle at 86% 62%, rgba(236,72,153,0.12), transparent 60%), radial-gradient(900px circle at 50% 92%, rgba(34,197,94,0.10), transparent 60%), linear-gradient(180deg, #020617 0%, #030712 100%)",
       }}
     >
-      {/* Layer 1: Subtle Grid Pattern */}
-      <div className="absolute inset-0 z-0 bg-grid opacity-10" />
+      {/* Base grid */}
+      <div className="absolute inset-0 z-0 bg-grid opacity-[0.10]" />
 
-      {/* Layer 1.5: Aurora bands */}
-      <motion.div
-        className="absolute inset-0 z-0 opacity-[0.18] mix-blend-screen"
-        animate={{
-          backgroundPosition: ["0% 50%", "100% 50%", "0% 50%"],
-          opacity: [0.12, 0.22, 0.12],
-        }}
-        transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
+      {/* Canvas particles + link lines */}
+      <canvas ref={canvasRef} className="absolute inset-0 z-0" />
+
+      {/* Aurora band (CSS-only) */}
+      <div
+        className="absolute inset-0 z-0 opacity-[0.16] mix-blend-screen animate-[gradientMove_18s_ease-in-out_infinite]"
         style={{
           backgroundImage:
-            "linear-gradient(90deg, rgba(99,102,241,0.0) 0%, rgba(99,102,241,0.18) 25%, rgba(236,72,153,0.16) 55%, rgba(34,197,94,0.12) 75%, rgba(99,102,241,0.0) 100%)",
-          backgroundSize: "200% 100%",
+            "linear-gradient(90deg, rgba(99,102,241,0.0) 0%, rgba(99,102,241,0.16) 25%, rgba(236,72,153,0.12) 55%, rgba(34,197,94,0.10) 75%, rgba(99,102,241,0.0) 100%)",
+          backgroundSize: "220% 100%",
         }}
       />
 
-      {/* Layer 2: Animated Depth Blobs (Specific Radial Gradients) */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        <motion.div 
-          animate={{
-            scale: [1, 1.2, 1],
-            x: [0, 50, 0],
-            y: [0, 30, 0]
-          }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-[10%] left-[10%] w-[600px] h-[600px] rounded-full bg-[radial-gradient(circle,rgb(99_102_241_/_0.15),transparent_70%)] blur-[60px]"
-        />
-        <motion.div 
-          animate={{
-            scale: [1.2, 1, 1.2],
-            x: [0, -40, 0],
-            y: [0, -50, 0]
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-[15%] right-[10%] w-[500px] h-[500px] rounded-full bg-[radial-gradient(circle,rgb(236_72_153_/_0.12),transparent_70%)] blur-[50px]"
-        />
-        <motion.div 
-          animate={{
-            scale: [1, 1.3, 1],
-            opacity: [0.05, 0.1, 0.05]
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] rounded-full bg-[radial-gradient(circle,rgb(34_197_94_/_0.08),transparent_70%)] blur-[80px]"
-        />
-      </div>
-
-      {/* Layer 3: Particles (AI/Neural Network Vibe) */}
-      {init && (
-        <Particles
-          id="global-tsparticles"
-          options={{
-            background: { color: { value: "transparent" } },
-            fpsLimit: 120,
-            particles: {
-              color: { value: ["#ffffff", "#6366f1", "#ec4899", "#22c55e"] },
-              move: {
-                enable: true,
-                speed: { min: 0.2, max: 0.9 },
-                direction: "none",
-                random: true,
-                straight: false,
-                outModes: { default: "out" },
-              },
-              number: {
-                density: { enable: true, area: 800 },
-                value: 170,
-              },
-              opacity: {
-                value: { min: 0.15, max: 0.65 },
-                animation: { enable: true, speed: 0.5, sync: false }
-              },
-              shape: { type: "circle" },
-              size: { value: { min: 0.6, max: 2.6 } },
-              twinkle: {
-                particles: {
-                  enable: true,
-                  frequency: 0.05,
-                  opacity: 1
-                }
-              },
-              links: {
-                enable: true,
-                distance: 160,
-                opacity: 0.06,
-                width: 1,
-                color: { value: "#6366f1" },
-                triangles: { enable: false },
-              },
-            },
-            interactivity: {
-              events: {
-                onHover: { enable: true, mode: ["grab"] },
-                onClick: { enable: true, mode: ["push"] },
-              },
-              modes: {
-                grab: { distance: 180, links: { opacity: 0.12 } },
-                push: { quantity: 4 },
-              },
-            },
-            detectRetina: true,
-          }}
-        />
-      )}
-
-      {/* Layer 4: Cinematic Grain Texture */}
-      <div 
-        className="absolute inset-0 opacity-[0.02] pointer-events-none mix-blend-overlay"
-        style={{ 
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` 
+      {/* Vignette */}
+      <div
+        className="absolute inset-0 pointer-events-none opacity-70"
+        style={{
+          background:
+            "radial-gradient(60% 60% at 50% 45%, transparent 0%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0.65) 100%)",
         }}
       />
-
-      {/* Layer 5: Slow vignette */}
-      <div className="absolute inset-0 pointer-events-none opacity-60" style={{ background: "radial-gradient(60% 60% at 50% 45%, transparent 0%, rgba(0,0,0,0.35) 80%, rgba(0,0,0,0.65) 100%)" }} />
     </div>
   );
 };
 
 export default BackgroundSystem;
+

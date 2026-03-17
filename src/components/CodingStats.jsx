@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Github, Code, Zap, Trophy, Loader2, BarChart3, Star, GitFork, Activity } from 'lucide-react';
-import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell } from 'recharts';
+import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
 import { fadeInUp, staggerContainer } from "../utils/animations";
 
 const GITHUB_USER = "prince093kumar";
 const LEETCODE_USER = "Prince62065";
+const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
 
 const FALLBACK_GITHUB = {
   followers: 12,
@@ -16,7 +17,15 @@ const FALLBACK_GITHUB = {
     { name: 'iSmart', stars: 15, forks: 9 },
     { name: 'Portfolio', stars: 25, forks: 15 },
     { name: 'DevOps-Lab', stars: 10, forks: 5 }
-  ]
+  ],
+  trendData: [
+    { month: "Oct", commits: 8 },
+    { month: "Nov", commits: 12 },
+    { month: "Dec", commits: 9 },
+    { month: "Jan", commits: 16 },
+    { month: "Feb", commits: 14 },
+    { month: "Mar", commits: 18 },
+  ],
 };
 
 const FALLBACK_LEETCODE = {
@@ -26,50 +35,179 @@ const FALLBACK_LEETCODE = {
   hardSolved: 15
 };
 
+const readCache = (key) => {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    if (!parsed?.ts || !parsed?.data) return null;
+    return parsed;
+  } catch {
+    return null;
+  }
+};
+
+const writeCache = (key, data) => {
+  try {
+    localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
+  } catch {
+    // ignore
+  }
+};
+
+const withTimeout = async (promise, ms, controller) => {
+  let timer;
+  try {
+    const timeout = new Promise((_, reject) => {
+      timer = setTimeout(() => {
+        controller?.abort?.();
+        reject(new Error("timeout"));
+      }, ms);
+    });
+    return await Promise.race([promise, timeout]);
+  } finally {
+    clearTimeout(timer);
+  }
+};
+
+const monthKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+
+const lastMonths = (count) => {
+  const now = new Date();
+  const fmt = new Intl.DateTimeFormat("en", { month: "short" });
+  const out = [];
+  for (let i = count - 1; i >= 0; i--) {
+    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    out.push({ key: monthKey(d), label: fmt.format(d) });
+  }
+  return out;
+};
+
+const buildMonthlyCommits = (events) => {
+  const months = lastMonths(6);
+  const map = new Map(months.map((m) => [m.key, 0]));
+
+  if (Array.isArray(events)) {
+    for (const ev of events) {
+      if (!ev?.created_at) continue;
+      if (ev.type !== "PushEvent") continue;
+      const d = new Date(ev.created_at);
+      const key = monthKey(d);
+      if (!map.has(key)) continue;
+      const commits = Number(ev?.payload?.size ?? 0) || 0;
+      map.set(key, (map.get(key) || 0) + commits);
+    }
+  }
+
+  return months.map((m) => ({ month: m.label, commits: map.get(m.key) || 0 }));
+};
+
 const CodingStats = () => {
-  const [githubData, setGithubData] = useState(null);
-  const [leetcodeData, setLeetcodeData] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [githubData, setGithubData] = useState(() => {
+    const cached = readCache("stats:github");
+    if (cached?.data) return cached.data;
+    return FALLBACK_GITHUB;
+  });
+  const [leetcodeData, setLeetcodeData] = useState(() => {
+    const cached = readCache("stats:leetcode");
+    if (cached?.data) return cached.data;
+    return FALLBACK_LEETCODE;
+  });
+  const [refreshing, setRefreshing] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      setLoading(true);
+      setRefreshing(true);
       try {
-        const ghPromise = fetch(`https://api.github.com/users/${GITHUB_USER}`).then(res => res.json());
-        const reposPromise = fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=stars&per_page=6`).then(res => res.json());
-        const lcPromise = fetch(`https://leetcode-stats-api.herokuapp.com/${LEETCODE_USER}`).then(res => res.json());
+        const cachedGh = readCache("stats:github");
+        const cachedLc = readCache("stats:leetcode");
+        const ghFresh = cachedGh && Date.now() - cachedGh.ts < CACHE_TTL_MS;
+        const lcFresh = cachedLc && Date.now() - cachedLc.ts < CACHE_TTL_MS;
 
-        const [ghJson, reposJson, lcJson] = await Promise.allSettled([ghPromise, reposPromise, lcPromise]);
+        // Fast-path: keep cached data if fresh, no blocking UI.
+        if (ghFresh && lcFresh) return;
 
-        if (ghJson.status === 'fulfilled' && !ghJson.value.message) {
-          const chartData = (reposJson.status === 'fulfilled' && Array.isArray(reposJson.value)) 
-            ? reposJson.value.map(repo => ({
-                name: repo.name.length > 10 ? repo.name.substring(0, 8) + '..' : repo.name,
-                stars: repo.stargazers_count || 0,
-                forks: repo.forks_count || 0
-              }))
-            : FALLBACK_GITHUB.chartData;
+        const ghController = new AbortController();
+        const reposController = new AbortController();
+        const lcController = new AbortController();
 
-          setGithubData({ 
+        const ghPromise = withTimeout(
+          fetch(`https://api.github.com/users/${GITHUB_USER}`, {
+            signal: ghController.signal,
+            headers: { Accept: "application/vnd.github+json" },
+          }).then((res) => res.json()),
+          2500,
+          ghController
+        );
+
+        const reposPromise = withTimeout(
+          fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=6`, {
+            signal: reposController.signal,
+            headers: { Accept: "application/vnd.github+json" },
+          }).then((res) => res.json()),
+          2500,
+          reposController
+        );
+
+        const eventsController = new AbortController();
+        const eventsPromise = withTimeout(
+          fetch(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=100`, {
+            signal: eventsController.signal,
+            headers: { Accept: "application/vnd.github+json" },
+          }).then((res) => res.json()),
+          2500,
+          eventsController
+        );
+
+        const lcPromise = withTimeout(
+          fetch(`https://leetcode-stats-api.herokuapp.com/${LEETCODE_USER}`, {
+            signal: lcController.signal,
+          }).then((res) => res.json()),
+          2500,
+          lcController
+        );
+
+        const [ghJson, reposJson, eventsJson, lcJson] = await Promise.allSettled([
+          ghPromise,
+          reposPromise,
+          eventsPromise,
+          lcPromise,
+        ]);
+
+        if (!ghFresh && ghJson.status === "fulfilled" && !ghJson.value?.message) {
+          const chartData =
+            reposJson.status === "fulfilled" && Array.isArray(reposJson.value)
+              ? reposJson.value.map((repo) => ({
+                  name: repo.name.length > 10 ? repo.name.substring(0, 8) + ".." : repo.name,
+                  stars: repo.stargazers_count || 0,
+                  forks: repo.forks_count || 0,
+                }))
+              : FALLBACK_GITHUB.chartData;
+
+          const trendData =
+            eventsJson.status === "fulfilled" && Array.isArray(eventsJson.value)
+              ? buildMonthlyCommits(eventsJson.value)
+              : FALLBACK_GITHUB.trendData;
+
+          const nextGh = {
             followers: ghJson.value.followers || FALLBACK_GITHUB.followers,
             public_repos: ghJson.value.public_repos || FALLBACK_GITHUB.public_repos,
-            chartData 
-          });
-        } else {
-          setGithubData(FALLBACK_GITHUB);
+            chartData,
+            trendData,
+          };
+          setGithubData(nextGh);
+          writeCache("stats:github", nextGh);
         }
 
-        if (lcJson.status === 'fulfilled' && lcJson.value.status === 'success') {
+        if (!lcFresh && lcJson.status === "fulfilled" && lcJson.value?.status === "success") {
           setLeetcodeData(lcJson.value);
-        } else {
-          setLeetcodeData(FALLBACK_LEETCODE);
+          writeCache("stats:leetcode", lcJson.value);
         }
 
       } catch {
-        setGithubData(FALLBACK_GITHUB);
-        setLeetcodeData(FALLBACK_LEETCODE);
+        // Keep last-known-good data (cached/fallback) to avoid blocking UI.
       } finally {
-        setTimeout(() => setLoading(false), 1000); 
+        setRefreshing(false);
       }
     };
 
@@ -80,11 +218,11 @@ const CodingStats = () => {
     if (active && payload && payload.length) {
       return (
         <div className="bg-[#0f172a]/95 border border-primary/20 p-4 rounded-2xl backdrop-blur-xl shadow-2xl">
-          <p className="text-white font-mono font-bold text-xs mb-2">{payload[0].payload.name}</p>
+          <p className="text-white font-mono font-bold text-xs mb-2">{payload[0].payload.month}</p>
           <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-yellow-500">
-              <Star size={12} />
-              <span className="text-[10px] font-mono font-black uppercase">Stars: {payload[0].value}</span>
+            <div className="flex items-center gap-2 text-blue-400">
+              <Activity size={12} />
+              <span className="text-[10px] font-mono font-black uppercase">Commits: {payload[0].value}</span>
             </div>
           </div>
         </div>
@@ -93,17 +231,8 @@ const CodingStats = () => {
     return null;
   };
 
-  if (loading) {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-[500px] gap-6">
-        <div className="relative">
-          <Loader2 className="w-16 h-16 text-primary animate-spin" />
-          <div className="absolute inset-0 blur-2xl bg-primary/20 animate-pulse rounded-full" />
-        </div>
-        <p className="text-white font-mono text-sm font-bold tracking-[0.3em] animate-pulse">SYNCING ENGINE METRICS</p>
-      </div>
-    );
-  }
+  const trendData = githubData?.trendData || FALLBACK_GITHUB.trendData;
+  const maxCommits = trendData.length ? Math.max(...trendData.map((d) => Number(d.commits) || 0)) : 0;
 
   return (
     <section className="section relative bg-transparent overflow-hidden">
@@ -120,9 +249,17 @@ const CodingStats = () => {
             <span className="font-mono text-xs font-bold uppercase tracking-[0.4em]">Analytics.v3()</span>
           </motion.div>
           
-          <h2 className="text-5xl md:text-7xl font-heading font-black text-white tracking-tighter mb-8 leading-tight">
-            SYSTEM <span className="text-gradient">TELEMETRY</span>
-          </h2>
+          <div className="flex flex-wrap items-center gap-4">
+            <h2 className="text-5xl md:text-7xl font-heading font-black text-white tracking-tighter mb-8 leading-tight">
+              SYSTEM <span className="text-gradient">TELEMETRY</span>
+            </h2>
+            {refreshing && (
+              <div className="mb-8 inline-flex items-center gap-2 px-3 py-2 rounded-full border border-white/10 bg-white/5 text-slate-300 text-[10px] font-mono font-black uppercase tracking-widest">
+                <Loader2 size={14} className="animate-spin" />
+                Refreshing
+              </div>
+            )}
+          </div>
         </motion.div>
 
         <div className="grid lg:grid-cols-12 gap-10">
@@ -150,39 +287,48 @@ const CodingStats = () => {
                   </div>
                </div>
 
-               {/* Bar Chart Visualization */}
-               <div className="h-[320px] w-full mb-10 group-hover:opacity-100 transition-opacity">
-                 <ResponsiveContainer width="100%" height="100%">
-                    <BarChart data={githubData?.chartData || []}>
-                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.02)" vertical={false} />
-                      <XAxis 
-                        dataKey="name" 
-                        stroke="rgba(255,255,255,0.3)" 
-                        fontSize={10} 
-                        tickLine={false} 
-                        axisLine={false}
-                        dy={15}
-                        fontFamily="JetBrains Mono"
-                        fontWeight="bold"
-                      />
-                      <YAxis hide={true} />
-                      <Tooltip content={<CustomTooltip />} cursor={{ fill: 'rgba(99, 102, 241, 0.05)', radius: [10, 10, 0, 0] }} />
-                      <Bar 
-                        dataKey="stars" 
-                        radius={[10, 10, 0, 0]} 
-                        animationDuration={1500}
-                      >
-                        {githubData?.chartData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-${index}`} 
-                            fill={index % 2 === 0 ? '#6366f1' : '#22C55E'} 
-                            fillOpacity={0.8}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
-                 </ResponsiveContainer>
-               </div>
+	               {/* Monthly Commit Trend (Line Graph) */}
+	               <div className="h-[320px] w-full mb-10 group-hover:opacity-100 transition-opacity">
+	                 <ResponsiveContainer width="100%" height="100%">
+	                    <LineChart data={trendData}>
+	                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
+	                      <XAxis
+	                        dataKey="month"
+	                        stroke="rgba(255,255,255,0.35)"
+	                        fontSize={10}
+	                        tickLine={false}
+	                        axisLine={false}
+	                        dy={12}
+	                        fontFamily="JetBrains Mono"
+	                        fontWeight="bold"
+	                      />
+	                      <YAxis
+	                        stroke="rgba(255,255,255,0.18)"
+	                        fontSize={10}
+	                        tickLine={false}
+	                        axisLine={false}
+	                        width={28}
+	                        domain={[0, Math.max(5, maxCommits + 2)]}
+	                        allowDecimals={false}
+	                      />
+	                      <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(99,102,241,0.35)", strokeWidth: 1 }} />
+	                      <Line
+	                        type="monotone"
+	                        dataKey="commits"
+	                        stroke="#3B82F6"
+	                        strokeWidth={3}
+	                        dot={{ r: 3, stroke: "rgba(255,255,255,0.6)", strokeWidth: 1, fill: "#3B82F6" }}
+	                        activeDot={{ r: 5 }}
+	                        isAnimationActive={false}
+	                      />
+	                    </LineChart>
+	                 </ResponsiveContainer>
+	               </div>
+                 {maxCommits === 0 && (
+                   <p className="text-[11px] text-slate-500 font-mono font-bold uppercase tracking-widest -mt-6 mb-6">
+                     No recent public commit events found — showing sample trend.
+                   </p>
+                 )}
 
                <div className="mt-auto grid grid-cols-2 gap-6 pt-8 border-t border-white/5">
                   <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center">

@@ -1,19 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { motion } from 'framer-motion';
 import Navbar from './components/Navbar';
 import Hero from './components/Hero.tsx';
-import About from './components/About';
-import Projects from './components/Projects';
-import CodingStats from './components/CodingStats';
-import Resume from './components/Resume';
-import Certifications from './components/Certifications';
-import Achievements from './components/Achievements';
-import Contact from './components/Contact';
-import Footer from './components/Footer';
 import BackgroundSystem from './components/common/BackgroundSystem';
 import SectionDivider from './components/common/SectionDivider';
-import SkillsSystemArchitecture from './components/SkillsSystemArchitecture';
 import { fadeInUp } from './utils/animations';
+
+const About = lazy(() => import('./components/About'));
+const SkillsSystemArchitecture = lazy(() => import('./components/SkillsSystemArchitecture'));
+const Projects = lazy(() => import('./components/Projects'));
+const CodingStats = lazy(() => import('./components/CodingStats'));
+const Resume = lazy(() => import('./components/Resume'));
+const Certifications = lazy(() => import('./components/Certifications'));
+const Achievements = lazy(() => import('./components/Achievements'));
+const Contact = lazy(() => import('./components/Contact'));
+const Footer = lazy(() => import('./components/Footer'));
 
 const SectionWrapper = ({ children, id }) => (
   <motion.div
@@ -25,6 +26,15 @@ const SectionWrapper = ({ children, id }) => (
   >
     {children}
   </motion.div>
+);
+
+const SectionFallback = ({ height = 320 }) => (
+  <div
+    className="w-full rounded-2xl border border-white/5 bg-white/[0.02]"
+    style={{ height }}
+    aria-busy="true"
+    aria-label="Loading section"
+  />
 );
 
 const App = () => {
@@ -77,45 +87,63 @@ const App = () => {
 
           <SectionDivider />
           <SectionWrapper id="about">
-            <About />
+            <Suspense fallback={<SectionFallback height={360} />}>
+              <About />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="skills">
-            <SkillsSystemArchitecture />
+            <Suspense fallback={<SectionFallback height={520} />}>
+              <SkillsSystemArchitecture />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="projects">
-            <Projects />
+            <Suspense fallback={<SectionFallback height={520} />}>
+              <Projects />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="stats">
-            <CodingStats />
+            <Suspense fallback={<SectionFallback height={420} />}>
+              <CodingStats />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="resume">
-            <Resume />
+            <Suspense fallback={<SectionFallback height={520} />}>
+              <Resume />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="certifications">
-            <Certifications />
+            <Suspense fallback={<SectionFallback height={420} />}>
+              <Certifications />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="achievements">
-            <Achievements />
+            <Suspense fallback={<SectionFallback height={420} />}>
+              <Achievements />
+            </Suspense>
           </SectionWrapper>
 
           <SectionDivider />
           <SectionWrapper id="contact">
-            <Contact />
+            <Suspense fallback={<SectionFallback height={520} />}>
+              <Contact />
+            </Suspense>
           </SectionWrapper>
 
-          <Footer />
+          <Suspense fallback={<div className="h-24" />}>
+            <Footer />
+          </Suspense>
         </main>
       </div>
     </div>
