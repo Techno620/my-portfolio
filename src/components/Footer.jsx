@@ -20,10 +20,10 @@ const Footer = () => {
         <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-10">
           <div className="space-y-2">
             <p className="text-white font-heading font-black tracking-tight text-xl">
-              Prince<span className="text-primary">.dev</span>
+              Prince<span className="text-secondary">.dev</span>
             </p>
             <p className="text-muted-foreground text-sm font-medium max-w-md">
-              Full‑stack developer building clean UI, secure APIs, and scalable systems.
+              Full-stack developer building clean UI, secure APIs, and scalable systems.
             </p>
           </div>
 
@@ -34,7 +34,7 @@ const Footer = () => {
                 href={href}
                 target={href.startsWith("http") ? "_blank" : undefined}
                 rel={href.startsWith("http") ? "noopener noreferrer" : undefined}
-                className="w-11 h-11 rounded-md border-2 border-white/10 bg-surface/30 backdrop-blur-md flex items-center justify-center text-slate-400 hover:text-white hover:border-primary/35 hover:bg-primary/10 transition-all"
+                className="w-11 h-11 rounded-md border-2 border-white/10 bg-surface/30 backdrop-blur-md flex items-center justify-center text-slate-400 hover:text-white hover:border-secondary/35 hover:bg-secondary/10 transition-all"
                 aria-label={label}
                 title={label}
               >
@@ -48,9 +48,6 @@ const Footer = () => {
           <p className="text-slate-500 text-[11px] font-mono font-bold uppercase tracking-[0.25em]">
             © {year} Prince Kumar
           </p>
-          <p className="text-slate-600 text-[11px] font-mono font-bold uppercase tracking-[0.25em]">
-            Built with React + Vite
-          </p>
         </div>
       </div>
     </footer>
@@ -58,4 +55,3 @@ const Footer = () => {
 };
 
 export default Footer;
-

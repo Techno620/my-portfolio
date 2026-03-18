@@ -42,8 +42,8 @@ const MagneticButton = ({ children, onClick, className, variant = "primary", as:
       onClick={onClick}
       className={`btn-magnetic px-8 py-4 rounded-xl font-mono font-bold uppercase tracking-wider text-sm transition-all relative overflow-hidden group inline-flex items-center justify-center gap-2 ${
         variant === "primary" 
-          ? "bg-primary text-white shadow-[0_0_20px_rgb(99_102_241_/_0.3)] hover:shadow-[0_0_30px_rgb(99_102_241_/_0.5)]" 
-          : "bg-transparent border border-secondary text-secondary hover:bg-secondary/10"
+          ? "bg-[#3B82F6] text-white hover:bg-[#2563EB] shadow-[0_0_20px_rgb(34_211_238_/_0.18)] hover:shadow-[0_0_30px_rgb(34_211_238_/_0.26)]" 
+          : "bg-transparent border border-[#3B82F6] text-[#3B82F6] hover:bg-[#3B82F6] hover:text-white shadow-[0_0_18px_rgb(34_211_238_/_0.10)] hover:shadow-[0_0_28px_rgb(34_211_238_/_0.18)]"
       } ${className}`}
       {...props}
     >

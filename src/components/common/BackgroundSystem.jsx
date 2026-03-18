@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
 
@@ -11,16 +11,6 @@ const BackgroundSystem = () => {
   const rootRef = useRef(null);
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
-
-  const palette = useMemo(
-    () => [
-      "rgba(255,255,255,0.85)",
-      "rgba(99,102,241,0.75)",
-      "rgba(236,72,153,0.65)",
-      "rgba(34,197,94,0.65)",
-    ],
-    []
-  );
 
   useEffect(() => {
     const root = rootRef.current;
@@ -63,7 +53,7 @@ const BackgroundSystem = () => {
       // Scale particle count with area (kept intentionally low for perf)
       const area = width * height;
       const target = clamp(Math.round(area / 32000), 40, 90);
-      const particles = Array.from({ length: target }).map((_, i) => {
+      const particles = Array.from({ length: target }).map(() => {
         const speed = 0.08 + Math.random() * 0.22;
         return {
           x: Math.random() * width,
@@ -71,7 +61,7 @@ const BackgroundSystem = () => {
           vx: (Math.random() - 0.5) * speed,
           vy: (Math.random() - 0.5) * speed,
           r: 0.6 + Math.random() * 1.8,
-          c: palette[i % palette.length],
+          c: Math.random() > 0.5 ? '#3b82f6' : '#06b6d4',
           tw: Math.random() * Math.PI * 2,
         };
       });
@@ -159,7 +149,7 @@ const BackgroundSystem = () => {
       window.removeEventListener("pointermove", onMove);
       ro.disconnect();
     };
-  }, [palette]);
+  }, []);
 
   return (
     <div
@@ -199,4 +189,3 @@ const BackgroundSystem = () => {
 };
 
 export default BackgroundSystem;
-

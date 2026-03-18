@@ -120,14 +120,14 @@ const Certifications = () => {
                     whileInView={{ opacity: 1, y: 0 }}
                     className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface border border-border text-primary text-xs font-mono font-bold uppercase tracking-widest"
                   >
-                    <Award size={14} /> Professional Validation
+                    <Award size={14} /> Certificate Section
                   </motion.div>
                   <motion.h2 
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     className="text-4xl md:text-5xl font-heading font-bold text-foreground"
                   >
-                    Industry <span className="text-primary">Certifications</span>
+                    Professional <span className="text-primary">Certificates</span>
                   </motion.h2>
                   <motion.div 
                     initial={{ width: 0 }}
@@ -253,7 +253,7 @@ const Certifications = () => {
                                     <img 
                                         src={selectedImage.image} 
                                         alt={selectedImage.title}
-                                        className="w-full h-auto object-contain max-h-[70vh] rounded border border-white/10 shadow-[0_0_30px_rgb(56_189_248_/_0.1)]"
+                                        className="w-full h-auto object-contain max-h-[70vh] rounded border border-white/10 shadow-[0_0_30px_rgb(34_211_238_/_0.10)]"
                                     />
                                 </div>
                                 <div className="md:col-span-2 p-8 md:p-10 flex flex-col justify-center space-y-8">

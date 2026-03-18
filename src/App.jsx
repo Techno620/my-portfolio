@@ -7,7 +7,7 @@ import SectionDivider from './components/common/SectionDivider';
 import { fadeInUp } from './utils/animations';
 
 const About = lazy(() => import('./components/About'));
-const SkillsSystemArchitecture = lazy(() => import('./components/SkillsSystemArchitecture'));
+const SkillsGalaxy = lazy(() => import('./components/SkillsGalaxy'));
 const Projects = lazy(() => import('./components/Projects'));
 const CodingStats = lazy(() => import('./components/CodingStats'));
 const Resume = lazy(() => import('./components/Resume'));
@@ -95,7 +95,7 @@ const App = () => {
           <SectionDivider />
           <SectionWrapper id="skills">
             <Suspense fallback={<SectionFallback height={520} />}>
-              <SkillsSystemArchitecture />
+              <SkillsGalaxy />
             </Suspense>
           </SectionWrapper>
 

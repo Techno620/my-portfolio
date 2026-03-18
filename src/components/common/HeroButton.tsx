@@ -23,15 +23,15 @@ type Props = ButtonProps | AnchorProps;
 
 const variantClasses: Record<HeroButtonVariant, string> = {
   primary:
-    "bg-blue-500 text-white hover:bg-blue-600 shadow-[0_10px_30px_-18px_rgba(59,130,246,0.55)] hover:shadow-[0_18px_45px_-22px_rgba(59,130,246,0.75)]",
+    "bg-gradient-to-r from-blue-600 to-cyan-500 text-white border border-white/20 shadow-[0_12px_40px_-12px_rgba(37,99,235,0.4)] hover:shadow-[0_20px_50px_-12px_rgba(37,99,235,0.6)] hover:brightness-110",
   secondary:
-    "bg-transparent border border-blue-500 text-blue-500 hover:bg-blue-500 hover:text-white hover:shadow-[0_18px_45px_-24px_rgba(59,130,246,0.60)]",
+    "bg-white/10 backdrop-blur-md border border-white/20 text-white hover:bg-white/20 hover:border-white/30 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)]",
   tertiary:
-    "bg-white/5 text-white border border-white/10 hover:bg-white/10 hover:shadow-[0_18px_45px_-30px_rgba(255,255,255,0.12)]",
+    "bg-transparent text-slate-300 hover:text-white border border-white/10 hover:border-white/20 hover:bg-white/5",
 };
 
 const base =
-  "relative inline-flex items-center justify-center px-6 py-3 rounded-lg font-mono font-black uppercase tracking-wider text-sm transition-all duration-200 will-change-transform select-none";
+  "relative inline-flex items-center justify-center px-8 py-3.5 rounded-xl font-mono font-bold uppercase tracking-widest text-xs transition-all duration-300 will-change-transform select-none focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500/50";
 
 export default function HeroButton(props: Props) {
   const { children, className = "", variant = "primary", as = "button", ...rest } = props as Props & {
@@ -52,4 +52,3 @@ export default function HeroButton(props: Props) {
     </Component>
   );
 }
-

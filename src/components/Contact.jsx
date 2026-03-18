@@ -30,7 +30,7 @@ const ContactCard = ({ icon: Icon, title, value, href, delay, toneClass }) => {
       transition={{ delay, duration: 0.5 }}
       className="group relative"
     >
-      <div className="p-[2px] rounded-2xl bg-gradient-to-r from-white/10 via-white/5 to-white/10 group-hover:from-primary/35 group-hover:via-highlight/20 group-hover:to-secondary/25 transition-all duration-300">
+      <div className="p-[2px] rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 group-hover:from-primary/35 group-hover:to-secondary/25 transition-all duration-300">
         <div
           className={`flex items-center gap-4 p-5 rounded-2xl border-2 border-white/10 backdrop-blur-md transition-all duration-300 bg-gradient-to-br ${toneClass}`}
         >
@@ -84,14 +84,14 @@ const FloatingInput = ({ label, name, type = "text", value, onChange, required =
         onBlur={() => setIsFocused(false)}
         rows={isTextArea ? 4 : undefined}
         className={`w-full px-6 py-4 bg-surface/20 border-2 rounded-2xl text-foreground outline-none transition-all duration-200 font-sans text-sm font-semibold backdrop-blur-md
-          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgb(59_130_246_/_0.10)]" : "border-white/10 hover:border-white/20"}
+          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgb(34_211_238_/_0.12)]" : "border-white/10 hover:border-white/20"}
           ${isTextArea ? "resize-none min-h-[150px]" : ""}
         `}
       />
       <label
         className={`absolute left-6 transition-all duration-300 pointer-events-none font-mono tracking-widest
           ${(isFocused || hasValue)
-            ? "-top-2.5 left-4 px-2 py-0.5 text-[10px] text-primary bg-surface border-2 border-primary/20 rounded-lg font-black"
+            ? "-top-2.5 left-4 px-2 py-0.5 text-[10px] text-secondary bg-surface border-2 border-secondary/25 rounded-lg font-black"
             : "top-4 text-xs text-slate-500 font-black"
           }
         `}
@@ -211,7 +211,7 @@ const Contact = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-slate-400 text-base md:text-lg leading-relaxed max-w-xl mx-auto"
+            className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-xl mx-auto"
           >
             Have a project in mind or just want to say hi? I'm always open to new opportunities and collaborations.
           </motion.p>
@@ -226,7 +226,7 @@ const Contact = () => {
               value="princekumar09372@gmail.com" 
               href="mailto:princekumar09372@gmail.com" 
               delay={0.2}
-              toneClass="from-blue-500/10 via-surface/35 to-primary/10"
+              toneClass="from-primary/10 via-surface/35 to-secondary/10"
             />
             <ContactCard 
               icon={Github} 
@@ -234,7 +234,7 @@ const Contact = () => {
               value="github.com/prince093kumar" 
               href="https://github.com/prince093kumar" 
               delay={0.3}
-              toneClass="from-violet-500/10 via-surface/35 to-fuchsia-500/10"
+              toneClass="from-secondary/10 via-surface/35 to-primary/10"
             />
             <ContactCard 
               icon={Linkedin} 
@@ -242,7 +242,7 @@ const Contact = () => {
               value="linkedin.com/in/prince093kumar" 
               href="https://linkedin.com/in/prince093kumar" 
               delay={0.4}
-              toneClass="from-sky-500/10 via-surface/35 to-blue-500/10"
+              toneClass="from-primary/10 via-surface/35 to-secondary/10"
             />
             <ContactCard 
               icon={MapPin} 
@@ -250,7 +250,7 @@ const Contact = () => {
               value="Punjab, India" 
               href="#" 
               delay={0.5}
-              toneClass="from-emerald-500/10 via-surface/35 to-secondary/10"
+              toneClass="from-secondary/10 via-surface/35 to-primary/10"
             />
             
             <div className="pt-8 flex items-center gap-6">
@@ -275,11 +275,13 @@ const Contact = () => {
                   exit={{ opacity: 0, scale: 0.95 }}
                   className="flex flex-col items-center justify-center py-12 text-center"
                 >
-                  <div className="w-20 h-20 rounded-3xl bg-success/10 flex items-center justify-center text-success border border-success/20 mb-8 font-bold shadow-[0_0_40px_rgb(34_197_94_/_0.1)] relative">
+                  <div className="w-20 h-20 rounded-3xl bg-success/10 flex items-center justify-center text-success border border-success/20 mb-8 font-bold shadow-[0_0_40px_rgb(34_211_238_/_0.12)] relative">
                     <CheckCircle2 size={40} />
                   </div>
                   <h3 className="text-2xl font-heading font-bold text-white mb-3">Message Sent!</h3>
-                  <p className="text-slate-400 text-base max-w-sm">Thanks for reaching out. I'll get back to you as soon as possible.</p>
+                  <p className="text-muted-foreground text-base max-w-sm">
+                    Thanks for reaching out. I'll get back to you as soon as possible.
+                  </p>
                 </motion.div>
               ) : (
                 <motion.form
@@ -300,7 +302,7 @@ const Contact = () => {
                   <MagneticButton
                     disabled={formStatus === "loading"}
                     type="submit"
-                    className="w-full py-5 bg-gradient-to-r from-primary via-highlight to-secondary hover:brightness-110 shadow-[0_0_30px_rgb(99_102_241_/_0.22)]"
+                    className="w-full py-5"
                   >
                     {formStatus === "loading" ? (
                       <div className="flex items-center gap-3">

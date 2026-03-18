@@ -3,6 +3,58 @@ import { Download, Briefcase, GraduationCap, Calendar, Award } from "lucide-reac
 import { motion } from "framer-motion";
 import MagneticButton from "./common/MagneticButton";
 
+const revealContainer = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.15 } },
+};
+
+const revealItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.16, 1, 0.3, 1] } },
+};
+
+const timelineLine = {
+  hidden: { scaleY: 0, opacity: 0.55 },
+  visible: { scaleY: 1, opacity: 1, transition: { duration: 0.9, ease: [0.16, 1, 0.3, 1] } },
+};
+
+const SpotlightCard = ({ accent, shadow, children, className = "" }) => {
+  const ref = React.useRef(null);
+
+  const onMove = (e) => {
+    const el = ref.current;
+    if (!el) return;
+    const rect = el.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 100;
+    const y = ((e.clientY - rect.top) / rect.height) * 100;
+    el.style.setProperty("--sx", `${x}%`);
+    el.style.setProperty("--sy", `${y}%`);
+  };
+
+  const onLeave = () => {
+    const el = ref.current;
+    if (!el) return;
+    el.style.setProperty("--sx", `50%`);
+    el.style.setProperty("--sy", `50%`);
+  };
+
+  return (
+    <div
+      ref={ref}
+      onPointerMove={onMove}
+      onPointerLeave={onLeave}
+      className={`tech-card p-6 md:p-8 border border-white/10 backdrop-blur-2xl shadow-[0_12px_40px_-28px_rgba(0,0,0,0.8)] hover:-translate-y-1 hover:border-white/15 ${shadow} ${className}`}
+      style={{
+        background:
+          "radial-gradient(520px circle at var(--sx, 50%) var(--sy, 50%), rgba(255,255,255,0.06), transparent 56%), linear-gradient(180deg, rgba(255,255,255,0.035), rgba(255,255,255,0.015))",
+      }}
+    >
+      <div className={`absolute inset-0 pointer-events-none opacity-100 ${accent}`} />
+      <div className="relative">{children}</div>
+    </div>
+  );
+};
+
 const Resume = () => {
   const experiences = [
     {
@@ -43,31 +95,40 @@ const Resume = () => {
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
-          <motion.div 
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface border border-border text-primary text-xs font-mono font-bold uppercase tracking-widest"
+        <motion.div
+          variants={revealContainer}
+          initial="hidden"
+          whileInView="visible"
+          viewport={{ once: true, amount: 0.2 }}
+        >
+          <motion.div
+            variants={revealContainer}
+            className="text-center max-w-3xl mx-auto mb-20 space-y-4"
           >
-            <Award size={14} /> Technical Dossier
+              <motion.div
+                variants={revealItem}
+                className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-white/5 border border-white/10 text-secondary text-xs font-mono font-bold uppercase tracking-widest"
+              >
+                <Award size={14} /> Technical Dossier
+              </motion.div>
+            <motion.h2
+              variants={revealItem}
+              className="text-4xl md:text-5xl font-heading font-bold text-foreground"
+            >
+              Evolution of{" "}
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">
+                Expertise
+              </span>
+            </motion.h2>
+            <motion.div
+              variants={revealItem}
+              className="mx-auto h-px w-20 bg-gradient-to-r from-transparent via-white/25 to-transparent"
+            />
           </motion.div>
-          <motion.h2 
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-heading font-bold text-foreground"
-          >
-            Evolution of <span className="text-gradient">Expertise</span>
-          </motion.h2>
-          <motion.div 
-            initial={{ width: 0 }}
-            whileInView={{ width: "80px" }}
-            className="section-divider mx-auto"
-          />
-        </div>
 
-        <div className="grid lg:grid-cols-2 gap-16">
+          <div className="grid lg:grid-cols-2 gap-16">
           {/* Experience Column */}
-          <div className="space-y-10">
+          <motion.div variants={revealItem} className="space-y-10">
             <div className="flex items-center gap-4 mb-2">
               <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary border border-primary/20">
                 <Briefcase size={20} />
@@ -75,53 +136,58 @@ const Resume = () => {
               <h3 className="text-2xl font-heading font-bold text-foreground">Experience</h3>
             </div>
 
-            <div className="relative space-y-8 pl-4 border-l-2 border-border/50">
+            <motion.div variants={revealContainer} className="relative space-y-8 pl-10">
+              {/* Timeline line */}
+              <motion.div
+                aria-hidden="true"
+                variants={timelineLine}
+                className="absolute left-3 top-0 bottom-0 w-px origin-top bg-gradient-to-b from-secondary/0 via-secondary/35 to-secondary/0"
+              />
               {experiences.map((exp, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: -20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  className="relative"
-                >
+                <motion.div key={i} variants={revealItem} className="relative">
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-transparent border-2 border-primary shadow-[0_0_10px_rgb(56_189_248_/_0.5)]" />
+                <div className="absolute left-3 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-[#020617] border-2 border-primary/60 shadow-[0_0_12px_rgba(34,211,238,0.35)] z-10" />
                   
-                  <div className="tech-card p-6 md:p-8 hover:border-primary/30 group">
+                  <SpotlightCard
+                    accent="bg-gradient-to-br from-primary/10 via-transparent to-transparent"
+                    shadow="hover:shadow-[0_22px_55px_-40px_rgba(34,211,238,0.28)] hover:border-secondary/35"
+                    className="group"
+                  >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6">
                       <div className="space-y-1">
-                        <h4 className="text-xl font-heading font-bold text-foreground group-hover:text-primary transition-colors">
+                        <h4 className="text-xl font-heading font-bold text-foreground group-hover:text-secondary transition-colors">
                           {exp.role}
                         </h4>
-                        <p className="text-secondary font-mono text-sm font-bold uppercase tracking-wider">
+                        <p className="text-secondary/85 font-mono text-sm font-bold uppercase tracking-wider">
                           {exp.company}
                         </p>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-surface border border-border">
-                        <Calendar size={12} className="text-primary" />
+                      <div className="flex items-center gap-2 text-slate-200/70 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
+                        <Calendar size={12} className="text-secondary" />
                         <span>{exp.duration}</span>
                       </div>
                     </div>
 
-                    <p className="text-muted-foreground text-sm leading-relaxed mb-6">
+                    <p className="text-slate-200/80 text-sm leading-relaxed mb-6">
                       {exp.desc}
                     </p>
 
                     <div className="flex flex-wrap gap-2">
                       {exp.skills.map((skill, si) => (
-                        <span key={si} className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-1 rounded-md bg-primary/5 text-primary border border-primary/10">
+                        <span key={si} className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-1 rounded-md bg-white/5 text-white/90 border border-white/10">
                           {skill}
                         </span>
                       ))}
                     </div>
-                  </div>
+                  </SpotlightCard>
                 </motion.div>
               ))}
-            </div>
-          </div>
+            </motion.div>
+          </motion.div>
 
           {/* Education Column */}
-          <div className="space-y-10">
+          <motion.div variants={revealItem} className="space-y-10">
             <div className="flex items-center gap-4 mb-2">
               <div className="w-10 h-10 rounded-xl bg-secondary/10 flex items-center justify-center text-secondary border border-secondary/20">
                 <GraduationCap size={20} />
@@ -129,29 +195,34 @@ const Resume = () => {
               <h3 className="text-2xl font-heading font-bold text-foreground">Education</h3>
             </div>
 
-            <div className="relative space-y-8 pl-4 border-l-2 border-border/50">
+            <motion.div variants={revealContainer} className="relative space-y-8 pl-10">
+              {/* Timeline line */}
+              <motion.div
+                aria-hidden="true"
+                variants={timelineLine}
+                className="absolute left-3 top-0 bottom-0 w-px origin-top bg-gradient-to-b from-secondary/0 via-secondary/35 to-secondary/0"
+              />
               {education.map((edu, i) => (
-                <motion.div
-                  key={i}
-                  initial={{ opacity: 0, x: 20 }}
-                  whileInView={{ opacity: 1, x: 0 }}
-                  className="relative"
-                >
+                <motion.div key={i} variants={revealItem} className="relative">
                   {/* Timeline Dot */}
-                  <div className="absolute -left-[25px] top-2 w-4 h-4 rounded-full bg-transparent border-2 border-secondary shadow-[0_0_10px_rgb(99_102_241_/_0.5)]" />
+                  <div className="absolute left-3 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-[#020617] border-2 border-secondary/70 shadow-[0_0_12px_rgba(34,211,238,0.32)] z-10" />
                   
-                  <div className="tech-card p-6 md:p-8 hover:border-secondary/30 group">
+                  <SpotlightCard
+                    accent="bg-gradient-to-br from-secondary/10 via-transparent to-transparent"
+                    shadow="hover:shadow-[0_22px_55px_-40px_rgba(34,211,238,0.26)] hover:border-secondary/35"
+                    className="group"
+                  >
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div className="space-y-1">
                         <h4 className="text-xl font-heading font-bold text-foreground group-hover:text-secondary transition-colors">
                           {edu.degree}
                         </h4>
-                        <p className="text-primary font-mono text-xs font-bold uppercase tracking-widest">
+                        <p className="text-secondary/85 font-mono text-xs font-bold uppercase tracking-widest">
                           {edu.school}
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-surface border border-border">
+                      <div className="flex items-center gap-2 text-slate-200/70 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
                         <Calendar size={12} className="text-secondary" />
                         <span>{edu.year}</span>
                       </div>
@@ -160,18 +231,19 @@ const Resume = () => {
                     <div className="mt-4 flex items-center gap-2">
                       <span className={`text-[10px] font-mono font-bold uppercase tracking-widest px-2 py-1 rounded-md border ${
                         edu.grade === "Pursuing" 
-                        ? "bg-success/5 text-success border-success/20" 
-                        : "bg-surface text-muted-foreground border-border"
+                        ? "bg-secondary/10 text-secondary border-secondary/20" 
+                        : "bg-white/5 text-slate-200/70 border-white/10"
                       }`}>
                         {edu.grade}
                       </span>
                     </div>
-                  </div>
+                  </SpotlightCard>
                 </motion.div>
               ))}
-            </div>
+            </motion.div>
+          </motion.div>
           </div>
-        </div>
+        </motion.div>
 
         {/* Action Button */}
         <div className="text-center mt-20">

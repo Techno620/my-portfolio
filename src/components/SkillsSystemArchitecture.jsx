@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, Layers, ArrowRight } from "lucide-react";
+import { X, Layers, ArrowRight, Search, Grid3X3, Network } from "lucide-react";
 import { useMedia } from "react-use";
 import {
   SiReact,
@@ -22,46 +22,46 @@ import { DiJavascript1, DiJava } from "react-icons/di";
 
 const COLOR_PRESETS = {
   frontend: {
-    glow: "shadow-[0_0_40px_rgb(56_189_248_/_0.16)]",
-    border: "border-cyan-400/25",
-    from: "from-cyan-400/25",
-    to: "to-cyan-400/5",
-    text: "text-cyan-300",
+    glow: "shadow-[0_0_40px_rgb(34_211_238_/_0.14)]",
+    border: "border-secondary/25",
+    from: "from-primary/22",
+    to: "to-secondary/6",
+    text: "text-secondary",
   },
   backend: {
-    glow: "shadow-[0_0_40px_rgb(168_85_247_/_0.16)]",
-    border: "border-fuchsia-400/25",
-    from: "from-fuchsia-500/25",
-    to: "to-fuchsia-500/5",
-    text: "text-fuchsia-300",
+    glow: "shadow-[0_0_40px_rgb(34_211_238_/_0.14)]",
+    border: "border-secondary/25",
+    from: "from-primary/22",
+    to: "to-secondary/6",
+    text: "text-secondary",
   },
   databases: {
-    glow: "shadow-[0_0_40px_rgb(34_197_94_/_0.16)]",
-    border: "border-emerald-400/25",
-    from: "from-emerald-400/25",
-    to: "to-emerald-400/5",
-    text: "text-emerald-300",
+    glow: "shadow-[0_0_40px_rgb(34_211_238_/_0.14)]",
+    border: "border-secondary/25",
+    from: "from-primary/22",
+    to: "to-secondary/6",
+    text: "text-secondary",
   },
   tools: {
-    glow: "shadow-[0_0_40px_rgb(249_115_22_/_0.16)]",
-    border: "border-orange-400/25",
-    from: "from-orange-400/25",
-    to: "to-orange-400/5",
-    text: "text-orange-300",
+    glow: "shadow-[0_0_40px_rgb(34_211_238_/_0.14)]",
+    border: "border-secondary/25",
+    from: "from-primary/22",
+    to: "to-secondary/6",
+    text: "text-secondary",
   },
   programming: {
     glow: "shadow-[0_0_40px_rgb(34_211_238_/_0.14)]",
-    border: "border-cyan-300/20",
-    from: "from-cyan-300/25",
-    to: "to-cyan-300/5",
-    text: "text-cyan-200",
+    border: "border-secondary/25",
+    from: "from-primary/22",
+    to: "to-secondary/6",
+    text: "text-secondary",
   },
   core: {
-    glow: "shadow-[0_0_40px_rgb(236_72_153_/_0.16)]",
-    border: "border-pink-400/25",
-    from: "from-pink-400/25",
-    to: "to-pink-400/5",
-    text: "text-pink-300",
+    glow: "shadow-[0_0_40px_rgb(34_211_238_/_0.14)]",
+    border: "border-secondary/25",
+    from: "from-primary/22",
+    to: "to-secondary/6",
+    text: "text-secondary",
   },
 };
 
@@ -94,6 +94,37 @@ const ICONS = {
   DBMS: Layers,
   "API Design": Layers,
   Debugging: Layers,
+};
+
+const TECH_COLORS = {
+  Java: "text-orange-300",
+  JavaScript: "text-yellow-300",
+  SQL: "text-sky-300",
+  HTML5: "text-orange-400",
+  CSS3: "text-sky-300",
+  "Tailwind CSS": "text-cyan-400",
+  Bootstrap: "text-purple-300",
+  "React.js": "text-sky-400",
+  "Node.js": "text-emerald-400",
+  "Express.js": "text-slate-100",
+  PHP: "text-indigo-200",
+  Laravel: "text-red-400",
+  "RESTful APIs": "text-primary",
+  "Middleware Integration": "text-secondary",
+  "JWT Authentication": "text-emerald-300",
+  MySQL: "text-sky-300",
+  MongoDB: "text-emerald-400",
+  PostgreSQL: "text-sky-400",
+  Git: "text-orange-400",
+  GitHub: "text-slate-100",
+  Postman: "text-amber-400",
+  "VS Code": "text-sky-300",
+  Docker: "text-sky-400",
+  "Data Structures & Algorithms": "text-emerald-300",
+  "Object-Oriented Programming": "text-pink-300",
+  DBMS: "text-sky-300",
+  "API Design": "text-primary",
+  Debugging: "text-red-300",
 };
 
 const DOCS = {
@@ -234,19 +265,61 @@ const FloatingDot = ({ i }) => {
 const Badge = ({ label }) => {
   const Icon = ICONS[label] ?? Layers;
   const href = DOCS[label];
+  const colorClass = TECH_COLORS[label] ?? "text-slate-100";
   return (
     <motion.a
       initial={{ opacity: 0, y: 6, scale: 0.98 }}
       animate={{ opacity: 1, y: 0, scale: 1 }}
+      whileHover={{ y: -2, scale: 1.03 }}
+      whileTap={{ scale: 0.97 }}
+      transition={{ duration: 0.18 }}
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="inline-flex items-center gap-2 px-3 py-2 rounded-full border border-white/10 bg-white/5 text-[11px] font-mono font-black uppercase tracking-widest text-white/80 hover:border-white/20 hover:bg-white/10 transition-colors"
+      className="inline-flex items-center gap-2 px-3.5 py-2 rounded-full border border-white/10 bg-gradient-to-r from-white/10 via-slate-900/60 to-white/5 text-[11px] font-mono font-black uppercase tracking-widest text-white/85 hover:border-primary/40 hover:bg-white/10 transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617] shadow-[0_0_18px_rgba(15,23,42,0.85)]"
       title={`Open official docs: ${label}`}
     >
-      <Icon size={14} className="text-white/70" />
+      <span className={`flex h-6 w-6 items-center justify-center rounded-full bg-black/40 border border-white/15 ${colorClass}`}>
+        <Icon size={13} className="drop-shadow-[0_0_10px_rgba(15,23,42,0.85)]" />
+      </span>
       {label}
     </motion.a>
+  );
+};
+
+const Segmented = ({ value, onChange, options }) => {
+  return (
+    <div className="p-[1px] rounded-2xl bg-gradient-to-r from-primary/30 to-secondary/25 shadow-[0_0_30px_rgb(34_211_238_/_0.08)]">
+      <div className="flex items-center gap-1 rounded-2xl border border-white/10 bg-[#020617]/65 backdrop-blur-xl p-1">
+        {options.map((opt) => {
+          const active = value === opt.value;
+          const Icon = opt.icon;
+          return (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => onChange(opt.value)}
+              className={`relative inline-flex items-center gap-2 px-4 py-2 rounded-xl text-[11px] font-mono font-extrabold uppercase tracking-[0.22em] transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617] ${
+                active ? "text-white" : "text-slate-300/75 hover:text-white"
+              }`}
+              aria-pressed={active}
+            >
+              <span className="relative z-10 inline-flex items-center gap-2">
+                <Icon size={14} className={active ? "text-primary" : "text-white/70"} />
+                {opt.label}
+              </span>
+              {active && (
+                <motion.span
+                  layoutId="skillsViewPill"
+                  className="absolute inset-0 rounded-xl -z-0 border border-white/10 bg-gradient-to-r from-primary/18 to-secondary/14 shadow-[0_0_26px_rgb(34_211_238_/_0.12)]"
+                  transition={{ type: "spring", bounce: 0.18, duration: 0.55 }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+    </div>
   );
 };
 
@@ -301,6 +374,8 @@ const SkillsSystemArchitecture = () => {
   const isMobile = useMedia("(max-width: 640px)");
   const isTablet = useMedia("(max-width: 1024px)");
   const [selected, setSelected] = useState(BASE_NODES[2]?.id); // backend default
+  const [view, setView] = useState("map");
+  const [query, setQuery] = useState("");
 
   const nodes = useMemo(() => {
     if (!isTablet) return BASE_NODES;
@@ -317,6 +392,12 @@ const SkillsSystemArchitecture = () => {
   const selectedNode = nodeById[selected] ?? nodes[0];
 
   const panelPreset = COLOR_PRESETS[selectedNode.tone];
+  const normalizedQuery = query.trim().toLowerCase();
+  const filteredItems = useMemo(() => {
+    const items = selectedNode?.items ?? [];
+    if (!normalizedQuery) return items;
+    return items.filter((t) => t.toLowerCase().includes(normalizedQuery));
+  }, [selectedNode, normalizedQuery]);
 
   return (
     <section className="section relative overflow-hidden bg-transparent">
@@ -335,118 +416,214 @@ const SkillsSystemArchitecture = () => {
       </div>
 
       <div className="container mx-auto px-6 relative z-10">
-        <div className="max-w-4xl mb-10">
+        <div className="max-w-5xl mb-10">
           <div className="flex items-center gap-4 text-primary mb-6">
             <span className="w-12 h-px bg-primary/50" />
             <span className="font-mono text-xs font-bold uppercase tracking-[0.4em]">
               Skills.Map()
             </span>
           </div>
-          <h2 className="text-4xl md:text-6xl font-heading font-black text-white tracking-tighter leading-tight">
-            SYSTEM <span className="text-gradient">ARCHITECTURE</span>
-          </h2>
-          <p className="mt-4 text-lg text-muted-foreground font-medium leading-relaxed">
-            Explore the technologies that power my full-stack development workflow.
-          </p>
+          <div className="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+            <div className="max-w-3xl">
+              <h2 className="text-4xl md:text-6xl font-heading font-black text-white tracking-tighter leading-tight">
+                SKILLS <span className="text-gradient">SYSTEM</span>
+              </h2>
+              <p className="mt-4 text-lg text-muted-foreground font-medium leading-relaxed">
+                Interactive map + curated grid of the technologies I use to design, build, and ship full-stack products.
+              </p>
+            </div>
+
+            {!isMobile && (
+              <Segmented
+                value={view}
+                onChange={setView}
+                options={[
+                  { value: "map", label: "Map", icon: Network },
+                  { value: "grid", label: "Grid", icon: Grid3X3 },
+                ]}
+              />
+            )}
+          </div>
         </div>
 
         {isMobile ? (
           <MobileCards nodes={nodes} />
         ) : (
           <div className="grid lg:grid-cols-12 gap-10 items-start">
-            <div className="lg:col-span-8">
-              <div className="relative h-[620px] rounded-2xl border-2 border-white/10 bg-black/20 backdrop-blur-xl overflow-hidden">
-                <svg
-                  viewBox="0 0 100 100"
-                  className="absolute inset-0 w-full h-full"
-                  preserveAspectRatio="none"
+            <AnimatePresence mode="wait">
+              {view === "map" ? (
+                <motion.div
+                  key="map"
+                  className="lg:col-span-8"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.25 }}
                 >
-                  <defs>
-                    <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="1">
-                      <stop offset="0%" stopColor="rgba(99,102,241,0.55)" />
-                      <stop offset="50%" stopColor="rgba(236,72,153,0.35)" />
-                      <stop offset="100%" stopColor="rgba(34,197,94,0.35)" />
-                    </linearGradient>
-                  </defs>
-
-                  {EDGES.map((e) => {
-                    const a = nodeById[e.from]?.pos;
-                    const b = nodeById[e.to]?.pos;
-                    if (!a || !b) return null;
-                    const d = curvePath(a, b);
-                    return (
-                      <path
-                        key={e.id}
-                        d={d}
-                        fill="none"
-                        stroke="url(#lineGrad)"
-                        strokeWidth="0.8"
-                        strokeLinecap="round"
-                        className="arch-line"
-                        opacity="0.55"
-                      />
-                    );
-                  })}
-                </svg>
-
-                {nodes.map((node, idx) => {
-                  const preset = COLOR_PRESETS[node.tone];
-                  const isActive = selected === node.id;
-                  const floatDelay = (idx % 6) * 0.35;
-                  const floatDuration = 6.5 + (idx % 5) * 0.6;
-
-                  return (
-                    <div
-                      key={node.id}
-                      className="absolute"
-                      style={{
-                        left: `${node.pos.x}%`,
-                        top: `${node.pos.y}%`,
-                      }}
+                  <div className="relative h-[620px] rounded-[2rem] border-2 border-white/10 bg-black/20 backdrop-blur-xl overflow-hidden">
+                    <svg
+                      viewBox="0 0 100 100"
+                      className="absolute inset-0 w-full h-full"
+                      preserveAspectRatio="none"
                     >
-                      <div className="-translate-x-1/2 -translate-y-1/2">
+                      <defs>
+                        <linearGradient id="lineGrad" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="rgba(99,102,241,0.55)" />
+                          <stop offset="50%" stopColor="rgba(236,72,153,0.35)" />
+                          <stop offset="100%" stopColor="rgba(34,197,94,0.35)" />
+                        </linearGradient>
+                        <linearGradient id="activeLineGrad" x1="0" y1="0" x2="1" y2="1">
+                          <stop offset="0%" stopColor="rgba(255,255,255,0.55)" />
+                          <stop offset="35%" stopColor="rgba(99,102,241,0.70)" />
+                          <stop offset="70%" stopColor="rgba(236,72,153,0.45)" />
+                          <stop offset="100%" stopColor="rgba(34,197,94,0.45)" />
+                        </linearGradient>
+                      </defs>
+
+                      {EDGES.map((e) => {
+                        const a = nodeById[e.from]?.pos;
+                        const b = nodeById[e.to]?.pos;
+                        if (!a || !b) return null;
+                        const d = curvePath(a, b);
+                        const isHot = selected && (e.from === selected || e.to === selected);
+                        return (
+                          <path
+                            key={e.id}
+                            d={d}
+                            fill="none"
+                            stroke={isHot ? "url(#activeLineGrad)" : "url(#lineGrad)"}
+                            strokeWidth={isHot ? "1.15" : "0.8"}
+                            strokeLinecap="round"
+                            className={isHot ? "arch-line arch-line--hot" : "arch-line"}
+                            opacity={isHot ? "0.9" : "0.55"}
+                          />
+                        );
+                      })}
+                    </svg>
+
+                    {nodes.map((node, idx) => {
+                      const preset = COLOR_PRESETS[node.tone];
+                      const isActive = selected === node.id;
+                      const floatDelay = (idx % 6) * 0.35;
+                      const floatDuration = 6.5 + (idx % 5) * 0.6;
+
+                      return (
                         <div
-                          className="arch-float"
+                          key={node.id}
+                          className="absolute"
                           style={{
-                            animationDuration: `${floatDuration}s`,
-                            animationDelay: `${floatDelay}s`,
+                            left: `${node.pos.x}%`,
+                            top: `${node.pos.y}%`,
                           }}
                         >
-                          <motion.button
-                            type="button"
-                            onClick={() => setSelected(node.id)}
-                            className={`relative w-36 h-36 md:w-40 md:h-40 rounded-full border-2 backdrop-blur-xl cursor-pointer will-change-transform transition-all flex flex-col items-center justify-center text-center px-4 shadow-[inset_0_-18px_40px_rgba(0,0,0,0.35)] ${
-                              isActive ? `${preset.border} ${preset.glow}` : "border-white/10 hover:border-white/20"
-                            }`}
-                            style={{ background: SPHERE_BG[node.tone] }}
-                            initial={{ opacity: 0, scale: 0.96 }}
-                            whileInView={{ opacity: 1, scale: 1 }}
-                            viewport={{ once: true, amount: 0.25 }}
-                            whileHover={{ scale: 1.04 }}
-                          >
-                            <span className="absolute inset-0 rounded-full pointer-events-none">
-                              <span className="absolute inset-0 rounded-full opacity-70 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.22),transparent_58%)]" />
-                              <span className="absolute inset-0 rounded-full opacity-70 bg-[radial-gradient(circle_at_65%_80%,rgba(0,0,0,0.35),transparent_55%)]" />
-                            </span>
+                          <div className="-translate-x-1/2 -translate-y-1/2">
+                            <div
+                              className="arch-float"
+                              style={{
+                                animationDuration: `${floatDuration}s`,
+                                animationDelay: `${floatDelay}s`,
+                              }}
+                            >
+                              <motion.button
+                                type="button"
+                                onClick={() => setSelected(node.id)}
+                                className={`relative w-36 h-36 md:w-40 md:h-40 rounded-full border-2 backdrop-blur-xl cursor-pointer will-change-transform transition-all flex flex-col items-center justify-center text-center px-4 shadow-[inset_0_-18px_40px_rgba(0,0,0,0.35)] outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617] ${
+                                  isActive ? `${preset.border} ${preset.glow}` : "border-white/10 hover:border-white/20"
+                                }`}
+                                style={{ background: SPHERE_BG[node.tone] }}
+                                initial={{ opacity: 0, scale: 0.96 }}
+                                whileInView={{ opacity: 1, scale: 1 }}
+                                viewport={{ once: true, amount: 0.25 }}
+                                whileHover={{ scale: 1.04 }}
+                              >
+                                {isActive && (
+                                  <span
+                                    aria-hidden="true"
+                                    className="absolute -inset-1 rounded-full border border-white/10"
+                                    style={{
+                                      boxShadow: "0 0 60px rgba(99,102,241,0.18)",
+                                    }}
+                                  />
+                                )}
+                                <span className="absolute inset-0 rounded-full pointer-events-none">
+                                  <span className="absolute inset-0 rounded-full opacity-70 bg-[radial-gradient(circle_at_30%_25%,rgba(255,255,255,0.22),transparent_58%)]" />
+                                  <span className="absolute inset-0 rounded-full opacity-70 bg-[radial-gradient(circle_at_65%_80%,rgba(0,0,0,0.35),transparent_55%)]" />
+                                </span>
 
-                            <p className={`text-[10px] font-mono font-black uppercase tracking-[0.32em] ${preset.text}`}>
-                              {node.title}
-                            </p>
-                            <p className="text-white font-heading font-black text-base mt-2">
-                              {node.items.length} Tech
-                            </p>
-                          </motion.button>
+                                <p className={`text-[10px] font-mono font-black uppercase tracking-[0.32em] ${preset.text}`}>
+                                  {node.title}
+                                </p>
+                                <p className="text-white font-heading font-black text-base mt-2">
+                                  {node.items.length} Tech
+                                </p>
+                              </motion.button>
+                            </div>
+                          </div>
                         </div>
-                      </div>
-                    </div>
-                  );
-                })}
+                      );
+                    })}
 
-                <div className="absolute inset-0 pointer-events-none opacity-[0.04]">
-                  <div className="absolute inset-0 bg-grid" />
-                </div>
-              </div>
-            </div>
+                    <div className="absolute inset-0 pointer-events-none opacity-[0.04]">
+                      <div className="absolute inset-0 bg-grid" />
+                    </div>
+                  </div>
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="grid"
+                  className="lg:col-span-8"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 10 }}
+                  transition={{ duration: 0.25 }}
+                >
+                  <div className="grid md:grid-cols-2 gap-6">
+                    {nodes.map((node) => {
+                      const preset = COLOR_PRESETS[node.tone];
+                      const isActive = selected === node.id;
+                      return (
+                        <motion.button
+                          key={node.id}
+                          type="button"
+                          onClick={() => setSelected(node.id)}
+                          className={`tech-card p-7 text-left bg-surface/20 backdrop-blur-xl border-2 transition-all outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617] ${
+                            isActive ? `${preset.border} ${preset.glow}` : "border-white/10 hover:border-white/15"
+                          }`}
+                          whileHover={{ y: -2 }}
+                        >
+                          <div className="flex items-start justify-between gap-4">
+                            <div>
+                              <p className={`text-[10px] font-mono font-black uppercase tracking-[0.35em] ${preset.text}`}>
+                                {node.title}
+                              </p>
+                              <p className="mt-3 text-white font-heading font-black text-xl">
+                                {node.items.length} technologies
+                              </p>
+                            </div>
+                            <ArrowRight className="text-white/70" />
+                          </div>
+                          <div className="mt-5 flex flex-wrap gap-2">
+                            {node.items.slice(0, 5).map((t) => (
+                              <span
+                                key={t}
+                                className="text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white/80"
+                              >
+                                {t}
+                              </span>
+                            ))}
+                            {node.items.length > 5 && (
+                              <span className="text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white/60">
+                                +{node.items.length - 5} more
+                              </span>
+                            )}
+                          </div>
+                        </motion.button>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <div className="lg:col-span-4">
               <div className={`tech-card p-8 bg-surface/20 backdrop-blur-xl border-2 ${panelPreset.border}`}>
@@ -462,7 +639,7 @@ const SkillsSystemArchitecture = () => {
                   <button
                     type="button"
                     onClick={() => setSelected(null)}
-                    className="w-10 h-10 rounded-md border-2 border-white/10 bg-white/5 text-slate-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-center"
+                    className="w-10 h-10 rounded-xl border-2 border-white/10 bg-white/5 text-slate-300 hover:text-white hover:border-white/20 transition-all flex items-center justify-center outline-none focus-visible:ring-2 focus-visible:ring-primary/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[#020617]"
                     aria-label="Clear selection"
                     title="Clear selection"
                   >
@@ -470,12 +647,29 @@ const SkillsSystemArchitecture = () => {
                   </button>
                 </div>
 
+                <div className="mt-6">
+                  <div className="relative">
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-white/50" />
+                    <input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Filter technologies…"
+                      className="w-full pl-11 pr-4 py-3 rounded-2xl border-2 border-white/10 bg-white/5 text-white placeholder:text-white/35 font-mono text-[11px] font-black uppercase tracking-widest outline-none focus:border-primary/40 focus:bg-white/10 transition-colors"
+                    />
+                  </div>
+                </div>
+
                 <div className="mt-6 flex flex-wrap gap-2">
                   <AnimatePresence mode="popLayout">
-                    {selectedNode.items.map((t) => (
+                    {filteredItems.map((t) => (
                       <Badge key={t} label={t} />
                     ))}
                   </AnimatePresence>
+                  {filteredItems.length === 0 && (
+                    <div className="text-sm text-muted-foreground font-medium">
+                      No matches. Try a different keyword.
+                    </div>
+                  )}
                 </div>
 
                 <div className="mt-8 p-5 rounded-2xl border border-white/10 bg-white/5">
@@ -483,8 +677,8 @@ const SkillsSystemArchitecture = () => {
                     Hint
                   </p>
                   <p className="text-sm text-muted-foreground font-medium leading-relaxed mt-3">
-                    Click a node to explore its technologies. Hover nodes to amplify glow. The connections represent how I
-                    design and ship full-stack systems.
+                    Switch between <span className="text-white/80">Map</span> and <span className="text-white/80">Grid</span>.
+                    Select a domain to view the exact tools I use, with quick links to official docs.
                   </p>
                 </div>
               </div>
@@ -499,6 +693,11 @@ const SkillsSystemArchitecture = () => {
             stroke-dasharray: 6 8;
             animation: archFlow 3.2s linear infinite;
             will-change: stroke-dashoffset;
+          }
+          .arch-line--hot {
+            stroke-dasharray: 4 6;
+            animation-duration: 2.6s;
+            filter: drop-shadow(0 0 10px rgba(99,102,241,0.20));
           }
           .arch-float {
             animation-name: nodeFloat;

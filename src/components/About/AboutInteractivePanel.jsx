@@ -13,8 +13,8 @@ const STACK_ITEMS = [
   {
     id: "mern",
     title: "MERN Stack",
-    colorClass: "text-primary",
-    ringClass: "border-primary/30",
+    colorClass: "text-secondary",
+    ringClass: "border-secondary/30",
     chips: ["React.js", "Node.js", "Express.js", "MongoDB", "JWT"],
     note: "Modern web apps with clean UI + secure APIs.",
     icon: Layers,
@@ -31,8 +31,8 @@ const STACK_ITEMS = [
   {
     id: "prod",
     title: "Production Tools",
-    colorClass: "text-highlight",
-    ringClass: "border-highlight/30",
+    colorClass: "text-secondary",
+    ringClass: "border-secondary/30",
     chips: ["Docker", "AWS", "Git", "Linux"],
     note: "Builds that are deployable, observable, and scalable.",
     icon: ShieldCheck,
@@ -43,17 +43,17 @@ const PROJECT_ITEMS = [
   {
     title: "Recipe Generator (MERN)",
     detail: "Improved ingredient search performance through optimized REST API integration.",
-    tone: "from-primary/15 to-transparent",
+    tone: "from-primary/10 to-secondary/5",
   },
   {
     title: "Smart Agriculture Platform",
     detail: "Diagnostic reporting system connecting farmers with experts through digital workflows.",
-    tone: "from-secondary/15 to-transparent",
+    tone: "from-primary/10 to-secondary/5",
   },
   {
     title: "Consultant-Based Web Service",
     detail: "Documentation workflows with efficient backend processing + database optimization.",
-    tone: "from-highlight/15 to-transparent",
+    tone: "from-primary/10 to-secondary/5",
   },
 ];
 
@@ -88,7 +88,7 @@ const TiltCard = ({ children, className }) => {
       ref={ref}
       onMouseMove={onMove}
       onMouseLeave={reset}
-      className={`relative rounded-2xl border-2 border-white/10 bg-black/25 backdrop-blur-xl overflow-hidden ${className}`}
+      className={`relative rounded-2xl border-2 border-white/10 bg-[#0b1224]/55 backdrop-blur-xl overflow-hidden shadow-[0_30px_80px_-60px_rgba(0,0,0,0.75)] ${className}`}
       style={{
         transform: `perspective(1000px) rotateX(${tilt.rx}deg) rotateY(${tilt.ry}deg)`,
         transition: "transform 120ms ease",
@@ -97,7 +97,7 @@ const TiltCard = ({ children, className }) => {
       <div
         className="absolute inset-0 pointer-events-none opacity-60"
         style={{
-          background: `radial-gradient(420px circle at ${tilt.glowX}% ${tilt.glowY}%, rgba(99,102,241,0.16), transparent 55%)`,
+          background: `radial-gradient(420px circle at ${tilt.glowX}% ${tilt.glowY}%, rgba(34,211,238,0.16), transparent 55%)`,
         }}
       />
       <div className="absolute inset-0 pointer-events-none opacity-[0.06]">
@@ -121,10 +121,12 @@ const AboutInteractivePanel = () => {
     <TiltCard className="p-7 sm:p-8 md:p-9">
       <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4 mb-6 min-w-0">
         <div className="min-w-0">
-          <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-primary/80">
+          <p className="text-[10px] font-mono font-black uppercase tracking-[0.4em] text-secondary/80">
             Interactive
           </p>
-          <p className="text-white font-heading font-black text-3xl md:text-4xl tracking-tight">Explore</p>
+          <p className="text-white font-heading font-black text-4xl md:text-[44px] tracking-tight leading-none">
+            Explore
+          </p>
         </div>
 
         <div className="grid grid-cols-2 sm:flex sm:flex-wrap items-center gap-2 justify-start md:justify-end">
@@ -137,12 +139,12 @@ const AboutInteractivePanel = () => {
                 type="button"
                 aria-pressed={isActive}
                 onClick={() => setTab(t.id)}
-                className={`px-3.5 py-2 rounded-md border-2 text-[10px] font-mono font-black uppercase tracking-widest transition-all flex items-center justify-center sm:justify-start gap-2 whitespace-nowrap ${
-                  isActive
-                    ? "border-primary/35 bg-primary/10 text-primary"
-                    : "border-white/10 bg-surface/20 text-slate-400 hover:text-white hover:border-white/20"
-                }`}
-              >
+                  className={`px-3.5 py-2 rounded-md border-2 text-[10px] font-mono font-black uppercase tracking-widest transition-all flex items-center justify-center sm:justify-start gap-2 whitespace-nowrap ${
+                    isActive
+                      ? "border-secondary/30 bg-secondary/10 text-secondary"
+                      : "border-white/10 bg-white/[0.04] text-slate-300/80 hover:text-white hover:border-white/20"
+                  }`}
+                >
                 <Icon size={14} />
                 <span>{t.label}</span>
               </button>
@@ -171,22 +173,22 @@ const AboutInteractivePanel = () => {
                     type="button"
                     onClick={() => setActiveStack(item.id)}
                     className={`p-4 rounded-xl border-2 text-left transition-all min-h-[120px] ${
-                      selected ? `${item.ringClass} bg-white/5` : "border-white/10 bg-surface/10 hover:bg-white/5"
+                      selected ? `${item.ringClass} bg-white/[0.06]` : "border-white/10 bg-white/[0.04] hover:bg-white/[0.06]"
                     }`}
                   >
                     <div className="flex items-center justify-between gap-3">
-                      <p className={`text-xs font-mono font-black uppercase tracking-[0.25em] ${item.colorClass}`}>
+                      <p className={`text-[11px] font-mono font-black uppercase tracking-[0.25em] ${item.colorClass}`}>
                         {item.title}
                       </p>
                       <Icon size={16} className={item.colorClass} />
                     </div>
-                    <p className="text-[12px] text-muted-foreground font-medium mt-3 leading-relaxed">{item.note}</p>
+                    <p className="text-[13px] text-muted-foreground font-semibold mt-3 leading-relaxed">{item.note}</p>
                   </button>
                 );
               })}
             </div>
 
-            <div className="p-6 rounded-xl border-2 border-white/10 bg-surface/15">
+            <div className="p-6 rounded-xl border-2 border-white/10 bg-white/[0.04]">
               <p className={`text-[10px] font-mono font-black uppercase tracking-[0.35em] ${active.colorClass}`}>
                 {active.title}
               </p>
@@ -194,7 +196,7 @@ const AboutInteractivePanel = () => {
                 {active.chips.map((chip) => (
                   <span
                     key={chip}
-                    className="text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/10 bg-white/5 text-white/80"
+                    className="text-[11px] font-mono font-black uppercase tracking-widest px-3 py-1.5 rounded-lg border border-white/10 bg-white/[0.06] text-white/90"
                   >
                     {chip}
                   </span>
@@ -216,7 +218,7 @@ const AboutInteractivePanel = () => {
             {PROJECT_ITEMS.map((p) => (
               <div key={p.title} className={`p-6 rounded-xl border-2 border-white/10 bg-gradient-to-r ${p.tone}`}>
                 <p className="text-white font-heading font-black text-lg">{p.title}</p>
-                <p className="mt-2 text-sm text-muted-foreground font-medium leading-relaxed">{p.detail}</p>
+                <p className="mt-2 text-sm text-muted-foreground font-semibold leading-relaxed">{p.detail}</p>
               </div>
             ))}
           </motion.div>
@@ -231,13 +233,13 @@ const AboutInteractivePanel = () => {
             transition={{ duration: 0.2 }}
             className="p-6 rounded-xl border-2 border-white/10 bg-surface/15"
           >
-            <p className="text-[10px] font-mono font-black uppercase tracking-[0.35em] text-primary/80">
+            <p className="text-[10px] font-mono font-black uppercase tracking-[0.35em] text-secondary/80">
               Core Strengths
             </p>
             <ul className="mt-5 space-y-3">
               {STRENGTHS.map((s) => (
-                <li key={s} className="flex items-start gap-3 text-sm text-muted-foreground font-medium">
-                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-primary shrink-0" />
+                <li key={s} className="flex items-start gap-3 text-sm text-muted-foreground font-semibold">
+                  <span className="mt-2 w-1.5 h-1.5 rounded-full bg-secondary shrink-0" />
                   {s}
                 </li>
               ))}
@@ -254,7 +256,7 @@ const AboutInteractivePanel = () => {
             transition={{ duration: 0.2 }}
             className="p-6 rounded-xl border-2 border-white/10 bg-surface/15"
           >
-            <p className="text-[10px] font-mono font-black uppercase tracking-[0.35em] text-highlight/90">
+            <p className="text-[10px] font-mono font-black uppercase tracking-[0.35em] text-secondary/85">
               Exploring Next
             </p>
             <ul className="mt-5 grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-3 gap-3">

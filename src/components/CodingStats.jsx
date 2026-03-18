@@ -1,30 +1,50 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Github, Code, Zap, Trophy, Loader2, BarChart3, Star, GitFork, Activity } from 'lucide-react';
-import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid } from 'recharts';
-import { fadeInUp, staggerContainer } from "../utils/animations";
+import { Activity, Binary, ExternalLink, Github, Loader2, Trophy } from 'lucide-react';
+import {
+  Bar,
+  BarChart,
+  CartesianGrid,
+  Cell,
+  Line,
+  LineChart,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from 'recharts';
+import { fadeInUp, staggerContainer } from '../utils/animations';
 
-const GITHUB_USER = "prince093kumar";
-const LEETCODE_USER = "Prince62065";
-const CACHE_TTL_MS = 6 * 60 * 60 * 1000; // 6 hours
+const GITHUB_USER = 'prince093kumar';
+const LEETCODE_USER = 'Prince62065';
+const HACKERRANK_USER = 'princekumar09372';
+
+const GITHUB_PROFILE_URL = `https://github.com/${GITHUB_USER}`;
+const LEETCODE_PROFILE_URL = `https://leetcode.com/${LEETCODE_USER}`;
+const HACKERRANK_PROFILE_URL = `https://www.hackerrank.com/profile/${HACKERRANK_USER}`;
+const HACKERRANK_API_BASE = import.meta.env.VITE_HACKERRANK_API_BASE || '/api/hackerrank';
+
+const GITHUB_TOKEN = import.meta.env.VITE_GITHUB_TOKEN;
+const CACHE_TTL_MS = 3 * 60 * 60 * 1000;
+const API_TIMEOUT_MS = 6000;
+
+const CACHE_KEYS = {
+  github: 'stats:v3:github',
+  leetcode: 'stats:v3:leetcode',
+  hackerrank: 'stats:v4:hackerrank',
+};
+
+const HACKERRANK_BAR_COLORS = ['#22D3EE', '#3B82F6', '#8B5CF6', '#22C55E', '#14B8A6', '#F59E0B'];
 
 const FALLBACK_GITHUB = {
   followers: 12,
   public_repos: 24,
-  chartData: [
-    { name: 'RecipeGen', stars: 12, forks: 8 },
-    { name: 'TechnoGrow', stars: 18, forks: 12 },
-    { name: 'iSmart', stars: 15, forks: 9 },
-    { name: 'Portfolio', stars: 25, forks: 15 },
-    { name: 'DevOps-Lab', stars: 10, forks: 5 }
-  ],
   trendData: [
-    { month: "Oct", commits: 8 },
-    { month: "Nov", commits: 12 },
-    { month: "Dec", commits: 9 },
-    { month: "Jan", commits: 16 },
-    { month: "Feb", commits: 14 },
-    { month: "Mar", commits: 18 },
+    { month: 'Oct', commits: 8 },
+    { month: 'Nov', commits: 12 },
+    { month: 'Dec', commits: 9 },
+    { month: 'Jan', commits: 16 },
+    { month: 'Feb', commits: 14 },
+    { month: 'Mar', commits: 18 },
   ],
 };
 
@@ -32,7 +52,24 @@ const FALLBACK_LEETCODE = {
   totalSolved: 142,
   easySolved: 65,
   mediumSolved: 62,
-  hardSolved: 15
+  hardSolved: 15,
+};
+
+const FALLBACK_HACKERRANK = {
+  username: HACKERRANK_USER,
+  badges: 12,
+  stars: 24,
+  rank: 'Top Performer',
+  points: 1680,
+  chartData: [
+    { label: 'Problem', score: 90 },
+    { label: 'Java', score: 82 },
+    { label: 'SQL', score: 88 },
+    { label: 'Python', score: 74 },
+    { label: 'C++', score: 70 },
+    { label: 'DSA', score: 92 },
+  ],
+  profileUrl: HACKERRANK_PROFILE_URL,
 };
 
 const readCache = (key) => {
@@ -51,161 +88,400 @@ const writeCache = (key, data) => {
   try {
     localStorage.setItem(key, JSON.stringify({ ts: Date.now(), data }));
   } catch {
-    // ignore
+    // Ignore storage errors.
   }
 };
 
 const withTimeout = async (promise, ms, controller) => {
   let timer;
   try {
-    const timeout = new Promise((_, reject) => {
+    const timeoutPromise = new Promise((_, reject) => {
       timer = setTimeout(() => {
         controller?.abort?.();
-        reject(new Error("timeout"));
+        reject(new Error('timeout'));
       }, ms);
     });
-    return await Promise.race([promise, timeout]);
+    return await Promise.race([promise, timeoutPromise]);
   } finally {
     clearTimeout(timer);
   }
 };
 
-const monthKey = (d) => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`;
+const githubHeaders = () => ({
+  Accept: 'application/vnd.github+json',
+  'X-GitHub-Api-Version': '2022-11-28',
+  ...(GITHUB_TOKEN ? { Authorization: `Bearer ${GITHUB_TOKEN}` } : {}),
+});
+
+const fetchJsonSafe = async (url, { signal, headers } = {}) => {
+  const response = await fetch(url, { signal, headers });
+  const data = await response.json().catch(() => null);
+  if (!response.ok) {
+    throw new Error(data?.message || `HTTP ${response.status}`);
+  }
+  return data;
+};
+
+const monthKey = (date) => `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
 
 const lastMonths = (count) => {
   const now = new Date();
-  const fmt = new Intl.DateTimeFormat("en", { month: "short" });
-  const out = [];
-  for (let i = count - 1; i >= 0; i--) {
-    const d = new Date(now.getFullYear(), now.getMonth() - i, 1);
-    out.push({ key: monthKey(d), label: fmt.format(d) });
+  const formatter = new Intl.DateTimeFormat('en', { month: 'short' });
+  const output = [];
+  for (let index = count - 1; index >= 0; index -= 1) {
+    const date = new Date(now.getFullYear(), now.getMonth() - index, 1);
+    output.push({ key: monthKey(date), label: formatter.format(date) });
   }
-  return out;
+  return output;
 };
 
-const buildMonthlyCommits = (events) => {
+const buildMonthlyCommitsFromEvents = (events) => {
   const months = lastMonths(6);
-  const map = new Map(months.map((m) => [m.key, 0]));
-
+  const bucket = new Map(months.map((month) => [month.key, 0]));
   if (Array.isArray(events)) {
-    for (const ev of events) {
-      if (!ev?.created_at) continue;
-      if (ev.type !== "PushEvent") continue;
-      const d = new Date(ev.created_at);
-      const key = monthKey(d);
-      if (!map.has(key)) continue;
-      const commits = Number(ev?.payload?.size ?? 0) || 0;
-      map.set(key, (map.get(key) || 0) + commits);
-    }
+    events.forEach((event) => {
+      if (!event?.created_at || event.type !== 'PushEvent') return;
+      const key = monthKey(new Date(event.created_at));
+      if (!bucket.has(key)) return;
+      const commits = Number(event?.payload?.size ?? 0) || 0;
+      bucket.set(key, (bucket.get(key) || 0) + commits);
+    });
   }
+  return months.map((month) => ({ month: month.label, commits: bucket.get(month.key) || 0 }));
+};
 
-  return months.map((m) => ({ month: m.label, commits: map.get(m.key) || 0 }));
+const buildMonthlyCommitsFromRepos = (repos) => {
+  const months = lastMonths(6);
+  const bucket = new Map(months.map((month) => [month.key, 0]));
+  if (Array.isArray(repos)) {
+    repos.forEach((repo) => {
+      const pushedAt = repo?.pushed_at || repo?.updated_at;
+      if (!pushedAt) return;
+      const key = monthKey(new Date(pushedAt));
+      if (!bucket.has(key)) return;
+      bucket.set(key, (bucket.get(key) || 0) + 1);
+    });
+  }
+  return months.map((month) => ({ month: month.label, commits: (bucket.get(month.key) || 0) * 3 }));
+};
+
+const buildMonthlyCommitsFromCommitLists = (commitLists) => {
+  const months = lastMonths(6);
+  const bucket = new Map(months.map((month) => [month.key, 0]));
+  if (Array.isArray(commitLists)) {
+    commitLists.forEach((commits) => {
+      if (!Array.isArray(commits)) return;
+      commits.forEach((commit) => {
+        const dateStr = commit?.commit?.author?.date || commit?.author?.date;
+        if (!dateStr) return;
+        const key = monthKey(new Date(dateStr));
+        if (!bucket.has(key)) return;
+        bucket.set(key, (bucket.get(key) || 0) + 1);
+      });
+    });
+  }
+  return months.map((month) => ({ month: month.label, commits: bucket.get(month.key) || 0 }));
+};
+
+const toArray = (value) => {
+  if (Array.isArray(value)) return value;
+  if (Array.isArray(value?.models)) return value.models;
+  if (Array.isArray(value?.model)) return value.model;
+  return [];
+};
+
+const shortLabel = (raw, fallback) => {
+  const normalized = String(raw || fallback || '').replace(/[_-]/g, ' ').replace(/\s+/g, ' ').trim();
+  if (!normalized) return 'Skill';
+  return normalized.length > 12 ? `${normalized.slice(0, 11)}…` : normalized;
+};
+
+const normalizeHackerRankData = (profilePayload, badgesPayload, skillsPayload, cachedData) => {
+  const profile = profilePayload?.model || profilePayload || {};
+  const badges = toArray(badgesPayload) || toArray(profile?.badges);
+  const skills = toArray(skillsPayload);
+
+  const skillChart = skills
+    .slice(0, 6)
+    .map((item, index) => ({
+      label: shortLabel(item?.name || item?.skill, `Skill ${index + 1}`),
+      score: Number(item?.score ?? item?.stars ?? item?.points ?? 0) || 0,
+    }))
+    .filter((item) => item.score > 0);
+
+  const badgeChart = badges
+    .slice(0, 6)
+    .map((item, index) => ({
+      label: shortLabel(item?.badge_name || item?.topic || item?.name, `Badge ${index + 1}`),
+      score: Number(item?.stars ?? item?.stars_count ?? item?.level ?? 0) || 0,
+    }))
+    .filter((item) => item.score > 0);
+
+  const chartData =
+    skillChart.length > 0
+      ? skillChart
+      : badgeChart.length > 0
+        ? badgeChart
+        : cachedData?.chartData || FALLBACK_HACKERRANK.chartData;
+
+  const starsFromBadges = badges.reduce(
+    (sum, badge) => sum + (Number(badge?.stars ?? badge?.stars_count ?? 0) || 0),
+    0
+  );
+
+  return {
+    username: profile?.username || cachedData?.username || FALLBACK_HACKERRANK.username,
+    badges:
+      badges.length ||
+      Number(profile?.badges_count ?? profile?.badges?.length ?? 0) ||
+      cachedData?.badges ||
+      FALLBACK_HACKERRANK.badges,
+    stars:
+      starsFromBadges ||
+      Number(profile?.stars ?? profile?.max_stars ?? profile?.total_stars ?? 0) ||
+      cachedData?.stars ||
+      FALLBACK_HACKERRANK.stars,
+    rank: String(profile?.rank || profile?.country_rank || cachedData?.rank || FALLBACK_HACKERRANK.rank),
+    points: Number(profile?.score ?? profile?.points ?? 0) || cachedData?.points || FALLBACK_HACKERRANK.points,
+    chartData,
+    profileUrl: HACKERRANK_PROFILE_URL,
+  };
+};
+
+const useElementWidth = () => {
+  const ref = useRef(null);
+  const [width, setWidth] = useState(0);
+
+  useEffect(() => {
+    const element = ref.current;
+    if (!element) return undefined;
+    const updateWidth = () => setWidth(element.clientWidth || 0);
+    updateWidth();
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(element);
+    window.addEventListener('resize', updateWidth);
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, []);
+
+  return [ref, width];
 };
 
 const CodingStats = () => {
-  const [githubData, setGithubData] = useState(() => {
-    const cached = readCache("stats:github");
-    if (cached?.data) return cached.data;
-    return FALLBACK_GITHUB;
-  });
-  const [leetcodeData, setLeetcodeData] = useState(() => {
-    const cached = readCache("stats:leetcode");
-    if (cached?.data) return cached.data;
-    return FALLBACK_LEETCODE;
-  });
+  const [githubData, setGithubData] = useState(() => readCache(CACHE_KEYS.github)?.data || FALLBACK_GITHUB);
+  const [leetcodeData, setLeetcodeData] = useState(() => readCache(CACHE_KEYS.leetcode)?.data || FALLBACK_LEETCODE);
+  const [hackerRankData, setHackerRankData] = useState(() => readCache(CACHE_KEYS.hackerrank)?.data || FALLBACK_HACKERRANK);
   const [refreshing, setRefreshing] = useState(false);
+
+  const [githubChartRef, githubChartWidth] = useElementWidth();
+  const [hackerRankChartRef, hackerRankChartWidth] = useElementWidth();
 
   useEffect(() => {
     const fetchData = async () => {
       setRefreshing(true);
       try {
-        const cachedGh = readCache("stats:github");
-        const cachedLc = readCache("stats:leetcode");
-        const ghFresh = cachedGh && Date.now() - cachedGh.ts < CACHE_TTL_MS;
-        const lcFresh = cachedLc && Date.now() - cachedLc.ts < CACHE_TTL_MS;
+        const cachedGithub = readCache(CACHE_KEYS.github);
+        const cachedLeetCode = readCache(CACHE_KEYS.leetcode);
+        const cachedHackerRank = readCache(CACHE_KEYS.hackerrank);
 
-        // Fast-path: keep cached data if fresh, no blocking UI.
-        if (ghFresh && lcFresh) return;
+        const githubFresh = cachedGithub && Date.now() - cachedGithub.ts < CACHE_TTL_MS;
+        const leetCodeFresh = cachedLeetCode && Date.now() - cachedLeetCode.ts < CACHE_TTL_MS;
+        const hackerRankFresh = cachedHackerRank && Date.now() - cachedHackerRank.ts < CACHE_TTL_MS;
 
-        const ghController = new AbortController();
-        const reposController = new AbortController();
-        const lcController = new AbortController();
+        const jobs = [];
 
-        const ghPromise = withTimeout(
-          fetch(`https://api.github.com/users/${GITHUB_USER}`, {
-            signal: ghController.signal,
-            headers: { Accept: "application/vnd.github+json" },
-          }).then((res) => res.json()),
-          2500,
-          ghController
-        );
+        if (!githubFresh) {
+          jobs.push((async () => {
+            const userController = new AbortController();
+            const reposController = new AbortController();
+            const eventsController = new AbortController();
 
-        const reposPromise = withTimeout(
-          fetch(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=6`, {
-            signal: reposController.signal,
-            headers: { Accept: "application/vnd.github+json" },
-          }).then((res) => res.json()),
-          2500,
-          reposController
-        );
+            const [userResult, reposResult, eventsResult] = await Promise.allSettled([
+              withTimeout(
+                fetchJsonSafe(`https://api.github.com/users/${GITHUB_USER}`, {
+                  signal: userController.signal,
+                  headers: githubHeaders(),
+                }),
+                API_TIMEOUT_MS,
+                userController
+              ),
+              withTimeout(
+                fetchJsonSafe(`https://api.github.com/users/${GITHUB_USER}/repos?sort=updated&per_page=20`, {
+                  signal: reposController.signal,
+                  headers: githubHeaders(),
+                }),
+                API_TIMEOUT_MS,
+                reposController
+              ),
+              withTimeout(
+                fetchJsonSafe(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=100`, {
+                  signal: eventsController.signal,
+                  headers: githubHeaders(),
+                }),
+                API_TIMEOUT_MS,
+                eventsController
+              ),
+            ]);
 
-        const eventsController = new AbortController();
-        const eventsPromise = withTimeout(
-          fetch(`https://api.github.com/users/${GITHUB_USER}/events/public?per_page=100`, {
-            signal: eventsController.signal,
-            headers: { Accept: "application/vnd.github+json" },
-          }).then((res) => res.json()),
-          2500,
-          eventsController
-        );
+            const user = userResult.status === 'fulfilled' ? userResult.value : null;
+            const repos = reposResult.status === 'fulfilled' ? reposResult.value : null;
+            const events = eventsResult.status === 'fulfilled' ? eventsResult.value : null;
 
-        const lcPromise = withTimeout(
-          fetch(`https://leetcode-stats-api.herokuapp.com/${LEETCODE_USER}`, {
-            signal: lcController.signal,
-          }).then((res) => res.json()),
-          2500,
-          lcController
-        );
+            const topRepos = Array.isArray(repos) ? repos.slice(0, 6) : [];
+            const sinceDate = new Date();
+            sinceDate.setMonth(sinceDate.getMonth() - 6);
 
-        const [ghJson, reposJson, eventsJson, lcJson] = await Promise.allSettled([
-          ghPromise,
-          reposPromise,
-          eventsPromise,
-          lcPromise,
-        ]);
+            let trendFromCommits = [];
+            let hasCommitResponse = false;
+            if (topRepos.length > 0) {
+              const commitResults = await Promise.allSettled(
+                topRepos.map((repo) => {
+                  const commitController = new AbortController();
+                  return withTimeout(
+                    fetchJsonSafe(
+                      `https://api.github.com/repos/${GITHUB_USER}/${repo.name}/commits?per_page=100&since=${encodeURIComponent(sinceDate.toISOString())}`,
+                      {
+                        signal: commitController.signal,
+                        headers: githubHeaders(),
+                      }
+                    ),
+                    API_TIMEOUT_MS,
+                    commitController
+                  );
+                })
+              );
+              hasCommitResponse = commitResults.some((result) => result.status === 'fulfilled');
+              trendFromCommits = buildMonthlyCommitsFromCommitLists(
+                commitResults.map((result) => (result.status === 'fulfilled' ? result.value : []))
+              );
+            }
 
-        if (!ghFresh && ghJson.status === "fulfilled" && !ghJson.value?.message) {
-          const chartData =
-            reposJson.status === "fulfilled" && Array.isArray(reposJson.value)
-              ? reposJson.value.map((repo) => ({
-                  name: repo.name.length > 10 ? repo.name.substring(0, 8) + ".." : repo.name,
-                  stars: repo.stargazers_count || 0,
-                  forks: repo.forks_count || 0,
-                }))
-              : FALLBACK_GITHUB.chartData;
+            const trendFromEvents = buildMonthlyCommitsFromEvents(events);
+            const trendFromRepos = buildMonthlyCommitsFromRepos(repos);
 
-          const trendData =
-            eventsJson.status === "fulfilled" && Array.isArray(eventsJson.value)
-              ? buildMonthlyCommits(eventsJson.value)
-              : FALLBACK_GITHUB.trendData;
+            const hasCommitTrend = trendFromCommits.some((item) => item.commits > 0);
+            const hasEventTrend = trendFromEvents.some((item) => item.commits > 0);
+            const hasRepoTrend = trendFromRepos.some((item) => item.commits > 0);
 
-          const nextGh = {
-            followers: ghJson.value.followers || FALLBACK_GITHUB.followers,
-            public_repos: ghJson.value.public_repos || FALLBACK_GITHUB.public_repos,
-            chartData,
-            trendData,
-          };
-          setGithubData(nextGh);
-          writeCache("stats:github", nextGh);
+            const nextGithub = {
+              followers: user?.followers ?? cachedGithub?.data?.followers ?? FALLBACK_GITHUB.followers,
+              public_repos: user?.public_repos ?? cachedGithub?.data?.public_repos ?? FALLBACK_GITHUB.public_repos,
+              trendData: hasCommitTrend
+                ? trendFromCommits
+                : hasEventTrend
+                  ? trendFromEvents
+                  : hasRepoTrend
+                    ? trendFromRepos
+                    : cachedGithub?.data?.trendData ?? FALLBACK_GITHUB.trendData,
+            };
+
+            const hasGithubResponse =
+              userResult.status === 'fulfilled' ||
+              reposResult.status === 'fulfilled' ||
+              eventsResult.status === 'fulfilled' ||
+              hasCommitResponse;
+
+            if (hasGithubResponse) {
+              setGithubData(nextGithub);
+              writeCache(CACHE_KEYS.github, nextGithub);
+            } else if (!cachedGithub?.data) {
+              setGithubData(FALLBACK_GITHUB);
+              writeCache(CACHE_KEYS.github, FALLBACK_GITHUB);
+            }
+          })());
         }
 
-        if (!lcFresh && lcJson.status === "fulfilled" && lcJson.value?.status === "success") {
-          setLeetcodeData(lcJson.value);
-          writeCache("stats:leetcode", lcJson.value);
+        if (!leetCodeFresh) {
+          jobs.push((async () => {
+            const lcController = new AbortController();
+            const lcResult = await withTimeout(
+              fetchJsonSafe(`https://leetcode-stats-api.herokuapp.com/${LEETCODE_USER}`, {
+                signal: lcController.signal,
+              }),
+              API_TIMEOUT_MS,
+              lcController
+            ).catch(() => null);
+
+            if (lcResult?.status === 'success') {
+              const normalized = {
+                totalSolved: Number(lcResult.totalSolved || 0),
+                easySolved: Number(lcResult.easySolved || 0),
+                mediumSolved: Number(lcResult.mediumSolved || 0),
+                hardSolved: Number(lcResult.hardSolved || 0),
+              };
+              setLeetcodeData(normalized);
+              writeCache(CACHE_KEYS.leetcode, normalized);
+            } else if (!cachedLeetCode?.data) {
+              setLeetcodeData(FALLBACK_LEETCODE);
+              writeCache(CACHE_KEYS.leetcode, FALLBACK_LEETCODE);
+            }
+          })());
         }
 
-      } catch {
-        // Keep last-known-good data (cached/fallback) to avoid blocking UI.
+        if (!hackerRankFresh) {
+          jobs.push((async () => {
+            const profileController = new AbortController();
+            const badgesController = new AbortController();
+            const skillsController = new AbortController();
+
+            const [profileResult, badgesResult, skillsResult] = await Promise.allSettled([
+              withTimeout(
+                fetchJsonSafe(`${HACKERRANK_API_BASE}/${HACKERRANK_USER}/profile`, {
+                  signal: profileController.signal,
+                  headers: { Accept: 'application/json' },
+                }),
+                API_TIMEOUT_MS,
+                profileController
+              ),
+              withTimeout(
+                fetchJsonSafe(`${HACKERRANK_API_BASE}/${HACKERRANK_USER}/badges`, {
+                  signal: badgesController.signal,
+                  headers: { Accept: 'application/json' },
+                }),
+                API_TIMEOUT_MS,
+                badgesController
+              ),
+              withTimeout(
+                fetchJsonSafe(`${HACKERRANK_API_BASE}/${HACKERRANK_USER}/skills`, {
+                  signal: skillsController.signal,
+                  headers: { Accept: 'application/json' },
+                }),
+                API_TIMEOUT_MS,
+                skillsController
+              ),
+            ]);
+
+            const profilePayload = profileResult.status === 'fulfilled' ? profileResult.value : null;
+            const badgesPayload = badgesResult.status === 'fulfilled' ? badgesResult.value : null;
+            const skillsPayload = skillsResult.status === 'fulfilled' ? skillsResult.value : null;
+
+            const nextHackerRank = normalizeHackerRankData(
+              profilePayload,
+              badgesPayload,
+              skillsPayload,
+              cachedHackerRank?.data
+            );
+
+            const hasResponse =
+              profileResult.status === 'fulfilled' ||
+              badgesResult.status === 'fulfilled' ||
+              skillsResult.status === 'fulfilled';
+
+            if (hasResponse) {
+              setHackerRankData(nextHackerRank);
+              writeCache(CACHE_KEYS.hackerrank, nextHackerRank);
+            } else if (!cachedHackerRank?.data) {
+              setHackerRankData(FALLBACK_HACKERRANK);
+              writeCache(CACHE_KEYS.hackerrank, FALLBACK_HACKERRANK);
+            }
+          })());
+        }
+
+        if (jobs.length > 0) {
+          await Promise.allSettled(jobs);
+        }
       } finally {
         setRefreshing(false);
       }
@@ -214,194 +490,253 @@ const CodingStats = () => {
     fetchData();
   }, []);
 
-  const CustomTooltip = ({ active, payload }) => {
-    if (active && payload && payload.length) {
-      return (
-        <div className="bg-[#0f172a]/95 border border-primary/20 p-4 rounded-2xl backdrop-blur-xl shadow-2xl">
-          <p className="text-white font-mono font-bold text-xs mb-2">{payload[0].payload.month}</p>
-          <div className="flex flex-col gap-1">
-            <div className="flex items-center gap-2 text-blue-400">
-              <Activity size={12} />
-              <span className="text-[10px] font-mono font-black uppercase">Commits: {payload[0].value}</span>
-            </div>
-          </div>
-        </div>
-      );
-    }
-    return null;
+  const trendData = githubData?.trendData || FALLBACK_GITHUB.trendData;
+  const maxCommits = trendData.length ? Math.max(...trendData.map((point) => Number(point.commits) || 0)) : 0;
+  const totalSolved = Math.max(1, Number(leetcodeData?.totalSolved || FALLBACK_LEETCODE.totalSolved));
+  const hackerRankChartData = hackerRankData?.chartData?.length ? hackerRankData.chartData : FALLBACK_HACKERRANK.chartData;
+  const hackerRankMaxScore = Math.max(10, ...hackerRankChartData.map((point) => Number(point.score) || 0));
+
+  const ChartTooltip = ({ active, payload, label }) => {
+    if (!active || !payload?.length) return null;
+    return (
+      <div className="rounded-xl border border-cyan-400/20 bg-slate-950/95 px-3 py-2 shadow-xl backdrop-blur-xl">
+        <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-200">{label}</p>
+        <p className="mt-1 text-xs font-semibold text-cyan-300">{payload[0].value}</p>
+      </div>
+    );
   };
 
-  const trendData = githubData?.trendData || FALLBACK_GITHUB.trendData;
-  const maxCommits = trendData.length ? Math.max(...trendData.map((d) => Number(d.commits) || 0)) : 0;
-
   return (
-    <section className="section relative bg-transparent overflow-hidden">
-      <div className="container mx-auto px-6 relative z-10">
-        <motion.div 
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true }}
-          className="max-w-4xl mb-20"
-        >
-          <motion.div variants={fadeInUp} className="flex items-center gap-4 text-primary mb-6">
-            <span className="w-12 h-px bg-primary/50" />
-            <span className="font-mono text-xs font-bold uppercase tracking-[0.4em]">Analytics.v3()</span>
+    <section className="section section-no-cv relative overflow-hidden bg-transparent">
+      <div className="pointer-events-none absolute inset-0 z-0">
+        <motion.div
+          animate={{ x: [0, 30, 0], y: [0, -20, 0], opacity: [0.2, 0.35, 0.2] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute -top-20 left-16 h-72 w-72 rounded-full bg-cyan-500/10 blur-3xl"
+        />
+        <motion.div
+          animate={{ x: [0, -24, 0], y: [0, 28, 0], opacity: [0.15, 0.28, 0.15] }}
+          transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
+          className="absolute top-1/3 right-20 h-80 w-80 rounded-full bg-violet-500/10 blur-3xl"
+        />
+      </div>
+
+      <div className="container mx-auto relative z-10 px-6">
+        <motion.div variants={staggerContainer} initial="hidden" whileInView="visible" viewport={{ once: true }} className="mb-14 max-w-5xl">
+          <motion.div variants={fadeInUp} className="mb-4 flex items-center gap-4 text-primary">
+            <span className="h-px w-12 bg-primary/50" />
+            <span className="font-mono text-xs font-bold uppercase tracking-[0.4em]">Analytics.v4()</span>
           </motion.div>
-          
           <div className="flex flex-wrap items-center gap-4">
-            <h2 className="text-5xl md:text-7xl font-heading font-black text-white tracking-tighter mb-8 leading-tight">
+            <h2 className="text-4xl font-heading font-black tracking-tight text-white md:text-6xl">
               SYSTEM <span className="text-gradient">TELEMETRY</span>
             </h2>
             {refreshing && (
-              <div className="mb-8 inline-flex items-center gap-2 px-3 py-2 rounded-full border border-white/10 bg-white/5 text-slate-300 text-[10px] font-mono font-black uppercase tracking-widest">
-                <Loader2 size={14} className="animate-spin" />
-                Refreshing
+              <div className="inline-flex items-center gap-2 rounded-full border border-cyan-300/20 bg-slate-900/70 px-3 py-1.5 text-[10px] font-mono font-black uppercase tracking-widest text-cyan-200">
+                <Loader2 size={13} className="animate-spin" />
+                Refreshing Sources
               </div>
             )}
           </div>
         </motion.div>
 
-        <div className="grid lg:grid-cols-12 gap-10">
-          
-          {/* GitHub Bar Chart Section */}
-          <motion.div 
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            className="lg:col-span-8 group"
+        <div className="grid grid-cols-1 items-stretch gap-6">
+          <motion.div
+            initial={{ opacity: 0, y: 18 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            whileHover={{ y: -4, scale: 1.005 }}
+            viewport={{ once: true }}
+            transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+            className="group h-full"
           >
-            <div className="glass-card p-10 rounded-2xl border-white/5 relative overflow-hidden h-full flex flex-col bg-surface/30 backdrop-blur-2xl">
-               <div className="flex items-center justify-between mb-12">
-                  <div className="flex items-center gap-5">
-                    <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all shadow-xl shadow-primary/10">
-                      <BarChart3 size={28} />
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-heading font-bold text-white tracking-tight">GitHub Impact</h3>
-                      <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">Star Distribution Analysis</p>
-                    </div>
+            <div className="glass-card rounded-2xl border border-white/10 bg-slate-950/60 p-6 backdrop-blur-xl transition-all duration-300 hover:border-cyan-300/30 hover:shadow-[0_18px_50px_-24px_rgba(34,211,238,0.45)] md:p-8">
+              <div className="mb-6 flex items-center justify-between">
+                <div className="flex items-center gap-4">
+                  <motion.div
+                    animate={{ y: [0, -3, 0] }}
+                    transition={{ duration: 3.6, repeat: Infinity, ease: 'easeInOut' }}
+                    className="flex h-12 w-12 items-center justify-center rounded-xl border border-blue-400/20 bg-blue-500/10 text-blue-300"
+                  >
+                    <Github size={24} />
+                  </motion.div>
+                  <div>
+                    <h3 className="text-2xl font-heading font-bold text-white">GitHub Impact</h3>
+                    <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Monthly Commit Activity</p>
                   </div>
-                  <div className="flex items-center gap-3 px-4 py-2 rounded-2xl bg-black/40 border border-white/10">
-                     <Activity size={14} className="text-green-500 animate-pulse" />
-                     <span className="text-[10px] font-mono font-black text-green-500 uppercase">Live Flux</span>
-                  </div>
-               </div>
+                </div>
+                <a
+                  href={GITHUB_PROFILE_URL}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg border border-cyan-300/20 bg-cyan-500/5 px-3 py-2 text-[10px] font-mono font-black uppercase tracking-widest text-cyan-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-cyan-500/15 hover:shadow-[0_10px_24px_-14px_rgba(34,211,238,0.8)]"
+                >
+                  Profile
+                  <ExternalLink size={12} />
+                </a>
+              </div>
 
-	               {/* Monthly Commit Trend (Line Graph) */}
-	               <div className="h-[320px] w-full mb-10 group-hover:opacity-100 transition-opacity">
-	                 <ResponsiveContainer width="100%" height="100%">
-	                    <LineChart data={trendData}>
-	                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(255,255,255,0.03)" vertical={false} />
-	                      <XAxis
-	                        dataKey="month"
-	                        stroke="rgba(255,255,255,0.35)"
-	                        fontSize={10}
-	                        tickLine={false}
-	                        axisLine={false}
-	                        dy={12}
-	                        fontFamily="JetBrains Mono"
-	                        fontWeight="bold"
-	                      />
-	                      <YAxis
-	                        stroke="rgba(255,255,255,0.18)"
-	                        fontSize={10}
-	                        tickLine={false}
-	                        axisLine={false}
-	                        width={28}
-	                        domain={[0, Math.max(5, maxCommits + 2)]}
-	                        allowDecimals={false}
-	                      />
-	                      <Tooltip content={<CustomTooltip />} cursor={{ stroke: "rgba(99,102,241,0.35)", strokeWidth: 1 }} />
-	                      <Line
-	                        type="monotone"
-	                        dataKey="commits"
-	                        stroke="#3B82F6"
-	                        strokeWidth={3}
-	                        dot={{ r: 3, stroke: "rgba(255,255,255,0.6)", strokeWidth: 1, fill: "#3B82F6" }}
-	                        activeDot={{ r: 5 }}
-	                        isAnimationActive={false}
-	                      />
-	                    </LineChart>
-	                 </ResponsiveContainer>
-	               </div>
-                 {maxCommits === 0 && (
-                   <p className="text-[11px] text-slate-500 font-mono font-bold uppercase tracking-widest -mt-6 mb-6">
-                     No recent public commit events found — showing sample trend.
-                   </p>
-                 )}
+              <div ref={githubChartRef} className="h-[280px] w-full">
+                {githubChartWidth > 0 && (
+                  <LineChart width={githubChartWidth} height={280} data={trendData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.14)" vertical={false} />
+                    <XAxis dataKey="month" stroke="rgba(203,213,225,0.5)" fontSize={11} tickLine={false} axisLine={false} dy={10} fontFamily="JetBrains Mono" />
+                    <YAxis stroke="rgba(148,163,184,0.4)" fontSize={11} tickLine={false} axisLine={false} width={30} domain={[0, Math.max(5, maxCommits + 2)]} allowDecimals={false} />
+                    <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgba(34,211,238,0.25)', strokeWidth: 1 }} />
+                    <Line type="monotone" dataKey="commits" stroke="#22D3EE" strokeWidth={3} dot={{ r: 3, stroke: '#0f172a', strokeWidth: 2, fill: '#3B82F6' }} activeDot={{ r: 5 }} />
+                  </LineChart>
+                )}
+              </div>
 
-               <div className="mt-auto grid grid-cols-2 gap-6 pt-8 border-t border-white/5">
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center">
-                    <span className="text-[10px] font-mono font-black text-slate-500 uppercase mb-2">Network Reach</span>
-                    <span className="text-3xl font-black text-white">{githubData?.followers} <span className="text-primary text-sm">Followers</span></span>
-                  </div>
-                  <div className="p-6 rounded-2xl bg-white/5 border border-white/5 flex flex-col items-center">
-                    <span className="text-[10px] font-mono font-black text-slate-500 uppercase mb-2">Code Inventory</span>
-                    <span className="text-3xl font-black text-white">{githubData?.public_repos} <span className="text-secondary text-sm">Repos</span></span>
-                  </div>
-               </div>
+              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30">
+                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Followers</p>
+                  <p className="mt-2 text-2xl font-black text-white">{githubData.followers}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30">
+                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Public Repos</p>
+                  <p className="mt-2 text-2xl font-black text-white">{githubData.public_repos}</p>
+                </div>
+              </div>
             </div>
           </motion.div>
 
-          {/* LeetCode Analysis Section */}
-          <motion.div 
-            initial={{ opacity: 0, x: 30 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            className="lg:col-span-4"
-          >
-            <div className="glass-card p-10 rounded-2xl border-white/5 relative overflow-hidden h-full flex flex-col bg-surface/30 backdrop-blur-2xl">
-               <div className="flex items-center gap-5 mb-12">
-                  <div className="w-14 h-14 rounded-2xl bg-yellow-500/10 flex items-center justify-center text-yellow-500 shadow-xl shadow-yellow-500/10">
-                    <Code size={28} />
+          <div className="grid grid-cols-1 items-stretch gap-6 lg:grid-cols-2">
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+              className="h-full"
+            >
+              <div className="glass-card flex h-full min-h-[500px] flex-col rounded-2xl border border-amber-300/20 bg-slate-950/65 p-6 backdrop-blur-xl transition-all duration-300 hover:border-amber-300/45 hover:shadow-[0_18px_50px_-24px_rgba(251,191,36,0.45)] md:p-7">
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <motion.div
+                      animate={{ y: [0, -3, 0] }}
+                      transition={{ duration: 3.2, repeat: Infinity, ease: 'easeInOut' }}
+                      className="flex h-11 w-11 items-center justify-center rounded-xl border border-amber-300/30 bg-amber-400/10 text-amber-300"
+                    >
+                      <Trophy size={22} />
+                    </motion.div>
+                    <div>
+                      <h3 className="text-xl font-heading font-bold text-white">LeetCode</h3>
+                      <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-100/70">Problem Solving Split</p>
+                    </div>
                   </div>
-                  <div>
-                    <h3 className="text-2xl font-heading font-bold text-white tracking-tight">Algorithmic</h3>
-                    <p className="text-[10px] font-mono font-bold text-slate-500 uppercase tracking-widest">LeetCode Real-time</p>
-                  </div>
-               </div>
+                  <a
+                    href={LEETCODE_PROFILE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-amber-300/30 bg-amber-500/10 px-2.5 py-1.5 text-[10px] font-mono font-black uppercase tracking-widest text-amber-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-amber-500/20 hover:shadow-[0_10px_24px_-14px_rgba(251,191,36,0.8)]"
+                  >
+                    Open
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
 
-               <div className="space-y-8 flex-grow">
+                <div className="flex-1 space-y-5">
                   {[
-                    { label: 'Easy', val: leetcodeData?.easySolved, color: 'bg-green-500' },
-                    { label: 'Medium', val: leetcodeData?.mediumSolved, color: 'bg-yellow-500' },
-                    { label: 'Hard', val: leetcodeData?.hardSolved, color: 'bg-red-500' }
-                  ].map((lvl, i) => (
-                    <div key={i} className="space-y-3">
-                      <div className="flex justify-between items-end px-1">
-                        <span className={`text-[10px] font-mono font-black uppercase ${lvl.color.replace('bg-', 'text-')}`}>{lvl.label}</span>
-                        <span className="text-xl font-black text-white">{lvl.val}</span>
+                    { label: 'Easy', value: Number(leetcodeData.easySolved || 0), color: 'bg-emerald-400' },
+                    { label: 'Medium', value: Number(leetcodeData.mediumSolved || 0), color: 'bg-amber-400' },
+                    { label: 'Hard', value: Number(leetcodeData.hardSolved || 0), color: 'bg-rose-400' },
+                  ].map((level) => (
+                    <div key={level.label} className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-100/85">{level.label}</span>
+                        <span className="text-lg font-black text-white">{level.value}</span>
                       </div>
-                      <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden p-[1px]">
-                        <motion.div 
+                      <div className="h-2 rounded-full bg-white/10 p-[1px]">
+                        <motion.div
                           initial={{ width: 0 }}
-                          whileInView={{ width: `${(lvl.val / leetcodeData?.totalSolved) * 100}%` }}
-                          transition={{ duration: 1.5, delay: i * 0.2 }}
-                          className={`h-full rounded-full ${lvl.color} shadow-[0_0_15px_rgb(0_0_0_/_0.5)]`}
+                          whileInView={{ width: `${Math.min(100, (level.value / totalSolved) * 100)}%` }}
+                          transition={{ duration: 0.8 }}
+                          className={`h-full rounded-full ${level.color}`}
                         />
                       </div>
                     </div>
                   ))}
-               </div>
+                </div>
 
-               <div className="mt-12 p-8 rounded-2xl bg-gradient-to-br from-primary/10 to-transparent border border-primary/20 text-center relative overflow-hidden group/btn">
-                  <div className="relative z-10">
-                    <p className="text-[10px] font-mono font-black text-slate-500 uppercase tracking-widest mb-1">Cumulative Solved</p>
-                    <p className="text-4xl font-black text-white mb-6">{leetcodeData?.totalSolved}</p>
-                    <a 
-                      href={`https://leetcode.com/${LEETCODE_USER}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-primary font-mono font-black text-xs uppercase tracking-widest hover:text-white transition-colors"
+                <div className="mt-6 rounded-xl border border-amber-300/20 bg-amber-400/[0.06] p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-amber-300/40">
+                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-amber-100/70">Total Solved</p>
+                  <p className="mt-2 text-3xl font-black text-white">{leetcodeData.totalSolved}</p>
+                </div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 18 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ y: -4, scale: 1.01 }}
+              viewport={{ once: true }}
+              transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+              className="h-full"
+            >
+              <div className="glass-card flex h-full min-h-[500px] flex-col rounded-2xl border border-emerald-300/20 bg-slate-950/65 p-6 backdrop-blur-xl transition-all duration-300 hover:border-emerald-300/45 hover:shadow-[0_18px_50px_-24px_rgba(34,197,94,0.45)] md:p-7">
+                <div className="mb-6 flex items-center justify-between">
+                  <div className="flex items-center gap-4">
+                    <motion.div
+                      animate={{ y: [0, -3, 0] }}
+                      transition={{ duration: 3.0, repeat: Infinity, ease: 'easeInOut' }}
+                      className="flex h-11 w-11 items-center justify-center rounded-xl border border-emerald-300/30 bg-emerald-400/10 text-emerald-300"
                     >
-                      <Trophy size={16} />
-                      Performance Log
-                    </a>
+                      <Binary size={20} />
+                    </motion.div>
+                    <div>
+                      <h3 className="text-xl font-heading font-bold text-white">HackerRank</h3>
+                      <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-100/70">Skills / Badge Trend</p>
+                    </div>
                   </div>
-                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl rounded-full" />
-               </div>
-            </div>
-          </motion.div>
+                  <a
+                    href={hackerRankData.profileUrl || HACKERRANK_PROFILE_URL}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1.5 rounded-lg border border-emerald-300/30 bg-emerald-500/10 px-2.5 py-1.5 text-[10px] font-mono font-black uppercase tracking-widest text-emerald-200 transition-all duration-200 hover:-translate-y-0.5 hover:bg-emerald-500/20 hover:shadow-[0_10px_24px_-14px_rgba(34,197,94,0.8)]"
+                  >
+                    Open
+                    <ExternalLink size={11} />
+                  </a>
+                </div>
 
+                <div ref={hackerRankChartRef} className="h-[190px] w-full flex-1">
+                  {hackerRankChartWidth > 0 && (
+                    <BarChart width={hackerRankChartWidth} height={190} data={hackerRankChartData}>
+                      <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.10)" vertical={false} />
+                      <XAxis dataKey="label" stroke="rgba(203,213,225,0.45)" fontSize={10} tickLine={false} axisLine={false} fontFamily="JetBrains Mono" />
+                      <YAxis stroke="rgba(148,163,184,0.35)" fontSize={10} tickLine={false} axisLine={false} width={24} domain={[0, hackerRankMaxScore + 10]} allowDecimals={false} />
+                      <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgba(34,211,238,0.25)', strokeWidth: 1 }} />
+                      <Bar dataKey="score" radius={[6, 6, 0, 0]} animationDuration={900}>
+                        {hackerRankChartData.map((entry, index) => (
+                          <Cell key={`${entry.label}-${index}`} fill={HACKERRANK_BAR_COLORS[index % HACKERRANK_BAR_COLORS.length]} />
+                        ))}
+                      </Bar>
+                    </BarChart>
+                  )}
+                </div>
+
+                <div className="mt-5 grid grid-cols-3 gap-3 border-t border-white/10 pt-5">
+                  <div className="rounded-lg border border-emerald-300/20 bg-emerald-400/[0.05] p-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300/40">
+                    <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400">Badges</p>
+                    <p className="mt-1 text-lg font-black text-white">{hackerRankData.badges}</p>
+                  </div>
+                  <div className="rounded-lg border border-emerald-300/20 bg-emerald-400/[0.05] p-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300/40">
+                    <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400">Stars</p>
+                    <p className="mt-1 text-lg font-black text-white">{hackerRankData.stars}</p>
+                  </div>
+                  <div className="rounded-lg border border-emerald-300/20 bg-emerald-400/[0.05] p-3 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-emerald-300/40">
+                    <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400">Points</p>
+                    <p className="mt-1 text-lg font-black text-white">{hackerRankData.points}</p>
+                  </div>
+                </div>
+
+                <div className="mt-4 flex items-center gap-2 text-[10px] font-mono font-bold uppercase tracking-widest text-emerald-200/80">
+                  <Activity size={12} />
+                  Rank: {hackerRankData.rank}
+                </div>
+              </div>
+            </motion.div>
+          </div>
         </div>
       </div>
     </section>

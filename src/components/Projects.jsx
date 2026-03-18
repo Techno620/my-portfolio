@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Github, Code2, ArrowRight } from "lucide-react";
+import { Github, ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { fadeInUp, staggerContainer, scaleIn } from "../utils/animations";
 
@@ -15,7 +15,7 @@ const Projects = () => {
     {
       title: "Recipe Generator",
       subtitle: "Full-stack MERN Application",
-      description: "A comprehensive MERN-based platform that optimizes ingredient search through a custom RESTful API and secure JWT authentication. This system significantly reduces search latency while providing a high-performance frontend driven by efficient global state management.",
+      description: "A comprehensive MERN-based platform that accelerates ingredient search through a custom RESTful API and secure JWT authentication. This system significantly reduces search latency while providing a high-performance frontend driven by efficient global state management.",
       image: recipeImg,
       tags: ["MongoDB", "Express.js", "React", "Node.js", "Tailwind CSS"],
       github: "https://github.com/prince093kumar/summer_training_mern/tree/main/Recipe_Generator",
@@ -66,10 +66,7 @@ const Projects = () => {
             FEATURED <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">PROJECTS</span>
           </motion.h2>
           
-          <motion.p
-            variants={fadeInUp}
-            className="text-xl text-muted-foreground leading-relaxed max-w-2xl font-medium"
-          >
+          <motion.p variants={fadeInUp} className="text-xl text-muted-foreground leading-relaxed max-w-2xl font-medium">
             Engineering scalable digital ecosystems with a focus on performant architecture and intuitive user interfaces.
           </motion.p>
         </motion.div>
@@ -79,7 +76,7 @@ const Projects = () => {
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-50px" }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-7 items-stretch"
         >
           {projects.map((project, idx) => (
             <motion.div
@@ -89,60 +86,62 @@ const Projects = () => {
               onMouseLeave={() => setHoveredIndex(null)}
               className="relative group h-full"
             >
-              <div className={`relative h-full flex flex-col glass-card overflow-hidden group transition-all duration-500 border-white/5 bg-white/5 backdrop-blur-xl ${
-                hoveredIndex === idx ? "shadow-[0_0_50px_rgb(99_102_241_/_0.15)] border-primary/30" : ""
+              <div className={`relative h-full flex flex-col rounded-2xl glass-card overflow-hidden group transition-all duration-500 transform-gpu hover:-translate-y-2 hover:shadow-[0_8px_30px_rgb(6_182_212_/_0.10)] border-white/10 bg-white/5 backdrop-blur-xl ${
+                hoveredIndex === idx ? "shadow-[0_0_50px_rgb(34_211_238_/_0.12)] border-secondary/30" : ""
               }`}>
                 
                 {/* Image Section */}
-                <div className="relative h-72 overflow-hidden border-b border-white/5">
+                <div className="relative h-64 md:h-72 overflow-hidden border-b border-white/10 rounded-t-2xl">
                   <img 
                     src={project.image} 
                     alt={project.title}
-                    className="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                    className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover:scale-105"
                     loading="lazy"
                     decoding="async"
-                    fetchpriority="low"
+                    fetchPriority="low"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/10 to-transparent opacity-90" />
                 </div>
 
                 {/* Content Section */}
-                <div className="p-7 flex-grow flex flex-col relative">
-                  <div className="mb-4">
-                    <h3 className="text-2xl md:text-3xl font-heading font-black text-white group-hover:text-primary transition-colors mb-1 leading-tight">
+                <div className="p-7 flex-1 flex flex-col relative">
+                  <div className="flex-1">
+                    <h3 className="text-2xl md:text-3xl font-heading font-black text-white group-hover:text-secondary transition-colors mb-1 leading-tight">
                       {project.title}
                     </h3>
-                    <p className="text-primary text-[11px] font-mono font-black uppercase tracking-widest opacity-90">
+                    <p className="text-secondary text-[11px] font-mono font-black uppercase tracking-widest opacity-90">
                       {project.subtitle}
                     </p>
+
+                    <p className="mt-4 text-muted-foreground text-sm md:text-base leading-relaxed line-clamp-4 font-medium">
+                      {project.description}
+                    </p>
+
+                    <div className="mt-6 flex flex-wrap gap-3">
+                      {project.tags.slice(0, 4).map((tag, i) => (
+                        <span 
+                          key={i}
+                          className="px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/20 text-xs font-mono font-black text-white"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
                   </div>
 
-                  <p className="text-slate-400 text-sm md:text-base leading-relaxed mb-6 line-clamp-4 font-medium">
-                    {project.description}
-                  </p>
-
-                  <div className="flex flex-wrap gap-3 mb-8">
-                    {project.tags.slice(0, 4).map((tag, i) => (
-                      <span 
-                        key={i}
-                        className="px-3 py-1.5 rounded-lg bg-primary/5 border border-primary/20 text-xs font-mono font-black text-white"
+                  <div className="mt-6 pt-5 border-t border-white/10 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 flex-wrap">
+                      <a 
+                        href={project.github} 
+                        target="_blank" 
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-2.5 text-white/95 group/link hover:text-primary transition-all font-black text-sm tracking-widest"
                       >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-
-                  <div className="mt-auto pt-6 border-t border-white/10 flex items-center justify-between">
-                    <a 
-                      href={project.github} 
-                      target="_blank" 
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-3 text-white group/link hover:text-primary transition-all font-black text-sm tracking-widest"
-                    >
-                      <Github size={20} />
-                      GITHUB
-                      <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all" />
-                    </a>
+                        <Github size={18} />
+                        GITHUB
+                        <ArrowRight size={16} className="opacity-0 -translate-x-2 group-hover/link:opacity-100 group-hover/link:translate-x-0 transition-all" />
+                      </a>
+                    </div>
                   </div>
                 </div>
               </div>

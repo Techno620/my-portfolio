@@ -6,20 +6,20 @@
   --font-mono: 'JetBrains Mono', monospace;
   --font-heading: 'Poppins', sans-serif;
 
-  /* Modern AI/Tech Color System */
-  --color-background: #020617;
-  --color-foreground: #F8FAFC;
-  --color-primary: #6366F1;
-  --color-secondary: #22C55E;
-  --color-accent: #34D399;
-  --color-success: #22C55E;
-  --color-highlight: #EC4899;
-  --color-text: #E5E7EB;
-  --color-muted-foreground: #94A3B8;
-  --color-card: rgba(15, 23, 42, 0.4);
-  --color-surface: rgba(15, 23, 42, 0.6);
+  /* Professional Tech Color System */
+  --color-background: #030712;
+  --color-foreground: #f8fafc;
+  --color-primary: #3b82f6;
+  --color-secondary: #06b6d4;
+  --color-accent: #6366f1;
+  --color-success: #10b981;
+  --color-highlight: #8b5cf6;
+  --color-text: #f1f5f9;
+  --color-muted-foreground: #94a3b8;
+  --color-card: rgba(17, 24, 39, 0.4);
+  --color-surface: rgba(17, 24, 39, 0.6);
   
-  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border: rgba(255, 255, 255, 0.08);
   --radius: 20px;
 }
 
@@ -43,11 +43,11 @@
     background: var(--color-background);
   }
   ::-webkit-scrollbar-thumb {
-    background: rgba(99, 102, 241, 0.2);
+    background: rgba(59, 130, 246, 0.22);
     border-radius: 10px;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background: var(--color-primary);
+    background: rgba(34, 211, 238, 0.35);
   }
 }
 
@@ -63,17 +63,17 @@
   }
 
   .tech-card:hover {
-    border-color: rgba(99, 102, 241, 0.2);
+    border-color: rgba(34, 211, 238, 0.22);
     transform: translateY(-4px);
-    box-shadow: 0 20px 40px -20px rgba(99, 102, 241, 0.15);
+    box-shadow: 0 20px 40px -20px rgba(34, 211, 238, 0.14);
   }
 
   .glow-text {
-    text-shadow: 0 0 10px rgba(99, 102, 241, 0.3);
+    text-shadow: 0 0 10px rgba(34, 211, 238, 0.28);
   }
 
   .text-gradient {
-    background: linear-gradient(90deg, #22C55E, #6366F1, #EC4899, #22C55E);
+    background: linear-gradient(90deg, #3b82f6, #06b6d4, #8b5cf6, #3b82f6);
     background-size: 200% auto;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
@@ -108,6 +108,11 @@
   isolation: isolate;
   content-visibility: auto;
   contain-intrinsic-size: 900px;
+}
+
+.section-no-cv {
+  content-visibility: visible;
+  contain-intrinsic-size: auto;
 }
 
 .section::before {

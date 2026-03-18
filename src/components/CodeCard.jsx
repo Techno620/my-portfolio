@@ -30,9 +30,9 @@ const CodeCard = () => {
         return code.split('\n').map((line, i) => {
             // Very basic syntax highlighting for the demo
             let formattedLine = line
-                .replace(/class|constructor|this|new/g, '<span class="text-pink-400">$&</span>')
-                .replace(/Prince Kumar|Full Stack Developer|System Architecture|REST API Engineering|Frontend Engineering|Build systems that scale./g, '<span class="text-emerald-400">"$&"</span>')
-                .replace(/name|role|specialties|philosophy/g, '<span class="text-cyan-400">$&</span>');
+                .replace(/class|constructor|this|new/g, '<span class="text-secondary">$&</span>')
+                .replace(/Prince Kumar|Full Stack Developer|System Architecture|REST API Engineering|Frontend Engineering|Build systems that scale./g, '<span class="text-secondary">"$&"</span>')
+                .replace(/name|role|specialties|philosophy/g, '<span class="text-secondary">$&</span>');
             
             return (
                 <div key={i} className="min-h-[1.5em] flex gap-4">
@@ -44,13 +44,13 @@ const CodeCard = () => {
     };
 
     return (
-        <div className="w-full glass-card border-white/5 bg-black/60 backdrop-blur-3xl overflow-hidden font-mono text-[13px] leading-relaxed group transition-all duration-500 hover:shadow-[0_0_50px_rgb(6_182_212_/_0.1)]">
+        <div className="w-full glass-card border-white/5 bg-black/60 backdrop-blur-3xl overflow-hidden font-mono text-[13px] leading-relaxed group transition-all duration-500 hover:shadow-[0_0_50px_rgb(34_211_238_/_0.10)]">
             {/* Header */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-white/5">
                 <div className="flex space-x-2">
-                    <div className="w-3 h-3 rounded-full bg-[#FF5F56]" />
-                    <div className="w-3 h-3 rounded-full bg-[#FFBD2E]" />
-                    <div className="w-3 h-3 rounded-full bg-[#27C93F]" />
+                    <div className="w-3 h-3 rounded-full bg-primary/70" />
+                    <div className="w-3 h-3 rounded-full bg-secondary/70" />
+                    <div className="w-3 h-3 rounded-full bg-white/20" />
                 </div>
                 <div className="text-[10px] text-white/30 uppercase tracking-[0.3em] font-bold">
                     SoftwareEngineer.js
