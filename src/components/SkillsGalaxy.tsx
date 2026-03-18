@@ -30,18 +30,28 @@ type TechItem = {
   href: string;
 };
 
+type AccentTone = {
+  textClass: string;
+  borderClass: string;
+  panelClass: string;
+  glowClass: string;
+  orbGlowClass: string;
+  lineColor: string;
+};
+
 type SkillGroup = {
   id: NodeId;
   title: string;
   subtitle: string;
-  accentText: string;
-  accentBg: string;
-  borderClass: string;
-  glow: string;
+  accent: AccentTone;
   technologies: TechItem[];
 };
 
 type Position = { x: number; y: number; depth: number };
+
+type PointerPoint = { x: number; y: number };
+
+const clamp = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
 
 const TECH_ICON_COLOR: Record<string, string> = {
   HTML: "text-[#E34F26]",
@@ -75,11 +85,15 @@ const SKILL_GROUPS: SkillGroup[] = [
   {
     id: "frontend",
     title: "Frontend Development",
-    subtitle: "Responsive interfaces and modular component design.",
-    accentText: "text-cyan-200",
-    accentBg: "from-cyan-500/16 to-blue-500/5",
-    borderClass: "border-cyan-300/30",
-    glow: "hover:shadow-[0_16px_44px_-24px_rgba(34,211,238,0.55)]",
+    subtitle: "Responsive interfaces and modular UI engineering.",
+    accent: {
+      textClass: "text-cyan-300",
+      borderClass: "border-cyan-400/50",
+      panelClass: "from-cyan-500/12 via-cyan-500/5 to-transparent",
+      glowClass: "hover:shadow-[0_14px_34px_-18px_rgba(34,211,238,0.7)]",
+      orbGlowClass: "shadow-[0_0_42px_rgba(34,211,238,0.2)]",
+      lineColor: "rgba(34,211,238,0.72)",
+    },
     technologies: [
       { name: "HTML", icon: SiHtml5, href: "https://developer.mozilla.org/en-US/docs/Web/HTML" },
       { name: "CSS", icon: SiCss, href: "https://developer.mozilla.org/en-US/docs/Web/CSS" },
@@ -89,12 +103,16 @@ const SKILL_GROUPS: SkillGroup[] = [
   },
   {
     id: "backend",
-    title: "Backend Development",
+    title: "Backend / MERN Stack",
     subtitle: "Secure APIs, auth flows, and scalable service architecture.",
-    accentText: "text-violet-200",
-    accentBg: "from-violet-500/16 to-fuchsia-500/5",
-    borderClass: "border-violet-300/35",
-    glow: "hover:shadow-[0_16px_44px_-24px_rgba(168,85,247,0.55)]",
+    accent: {
+      textClass: "text-emerald-300",
+      borderClass: "border-emerald-400/55",
+      panelClass: "from-emerald-500/14 via-emerald-500/6 to-transparent",
+      glowClass: "hover:shadow-[0_14px_34px_-18px_rgba(52,211,153,0.75)]",
+      orbGlowClass: "shadow-[0_0_48px_rgba(52,211,153,0.26)]",
+      lineColor: "rgba(52,211,153,0.74)",
+    },
     technologies: [
       { name: "Node.js", icon: SiNodedotjs, href: "https://nodejs.org/en/docs" },
       { name: "Express.js", icon: SiExpress, href: "https://expressjs.com/" },
@@ -107,11 +125,15 @@ const SKILL_GROUPS: SkillGroup[] = [
   {
     id: "programming",
     title: "Programming Languages",
-    subtitle: "Language fundamentals for writing clean, stable systems.",
-    accentText: "text-sky-200",
-    accentBg: "from-sky-500/16 to-indigo-500/5",
-    borderClass: "border-sky-300/30",
-    glow: "hover:shadow-[0_16px_44px_-24px_rgba(56,189,248,0.55)]",
+    subtitle: "Foundations for clean, stable, and maintainable systems.",
+    accent: {
+      textClass: "text-sky-300",
+      borderClass: "border-sky-400/45",
+      panelClass: "from-sky-500/14 via-indigo-500/6 to-transparent",
+      glowClass: "hover:shadow-[0_14px_34px_-18px_rgba(56,189,248,0.7)]",
+      orbGlowClass: "shadow-[0_0_42px_rgba(56,189,248,0.22)]",
+      lineColor: "rgba(56,189,248,0.7)",
+    },
     technologies: [
       { name: "Java", icon: DiJava, href: "https://docs.oracle.com/en/java/" },
       { name: "JavaScript", icon: DiJavascript1, href: "https://developer.mozilla.org/en-US/docs/Web/JavaScript" },
@@ -122,10 +144,14 @@ const SKILL_GROUPS: SkillGroup[] = [
     id: "databases",
     title: "Databases",
     subtitle: "Relational and NoSQL modeling with query optimization.",
-    accentText: "text-emerald-200",
-    accentBg: "from-emerald-500/16 to-teal-500/5",
-    borderClass: "border-emerald-300/30",
-    glow: "hover:shadow-[0_16px_44px_-24px_rgba(16,185,129,0.55)]",
+    accent: {
+      textClass: "text-orange-300",
+      borderClass: "border-orange-400/50",
+      panelClass: "from-orange-500/14 via-amber-500/6 to-transparent",
+      glowClass: "hover:shadow-[0_14px_34px_-18px_rgba(251,146,60,0.72)]",
+      orbGlowClass: "shadow-[0_0_42px_rgba(251,146,60,0.2)]",
+      lineColor: "rgba(251,146,60,0.72)",
+    },
     technologies: [
       { name: "MySQL", icon: SiMysql, href: "https://dev.mysql.com/doc/" },
       { name: "MongoDB", icon: SiMongodb, href: "https://www.mongodb.com/docs/" },
@@ -136,10 +162,14 @@ const SKILL_GROUPS: SkillGroup[] = [
     id: "devops",
     title: "DevOps / Tools",
     subtitle: "Delivery workflows, cloud readiness, and operations tooling.",
-    accentText: "text-amber-200",
-    accentBg: "from-amber-500/16 to-orange-500/5",
-    borderClass: "border-amber-300/30",
-    glow: "hover:shadow-[0_16px_44px_-24px_rgba(245,158,11,0.55)]",
+    accent: {
+      textClass: "text-violet-300",
+      borderClass: "border-violet-400/55",
+      panelClass: "from-violet-500/14 via-fuchsia-500/6 to-transparent",
+      glowClass: "hover:shadow-[0_14px_34px_-18px_rgba(167,139,250,0.75)]",
+      orbGlowClass: "shadow-[0_0_46px_rgba(167,139,250,0.25)]",
+      lineColor: "rgba(167,139,250,0.72)",
+    },
     technologies: [
       { name: "Docker", icon: SiDocker, href: "https://docs.docker.com/" },
       { name: "Git", icon: SiGit, href: "https://git-scm.com/doc" },
@@ -150,11 +180,15 @@ const SKILL_GROUPS: SkillGroup[] = [
   {
     id: "core",
     title: "Core Concepts",
-    subtitle: "Engineering fundamentals powering architecture decisions.",
-    accentText: "text-pink-200",
-    accentBg: "from-pink-500/16 to-rose-500/5",
-    borderClass: "border-pink-300/30",
-    glow: "hover:shadow-[0_16px_44px_-24px_rgba(244,114,182,0.55)]",
+    subtitle: "System fundamentals powering architecture decisions.",
+    accent: {
+      textClass: "text-fuchsia-300",
+      borderClass: "border-fuchsia-400/50",
+      panelClass: "from-fuchsia-500/14 via-rose-500/6 to-transparent",
+      glowClass: "hover:shadow-[0_14px_34px_-18px_rgba(232,121,249,0.75)]",
+      orbGlowClass: "shadow-[0_0_44px_rgba(232,121,249,0.2)]",
+      lineColor: "rgba(232,121,249,0.72)",
+    },
     technologies: [
       { name: "DSA", icon: Code2, href: "https://ocw.mit.edu/courses/6-006-introduction-to-algorithms-fall-2011/" },
       { name: "OOP", icon: Layers3, href: "https://docs.oracle.com/javase/tutorial/java/concepts/" },
@@ -165,22 +199,33 @@ const SKILL_GROUPS: SkillGroup[] = [
   },
 ];
 
+const GROUP_LOOKUP = SKILL_GROUPS.reduce(
+  (map, group) => {
+    map[group.id] = group;
+    return map;
+  },
+  {} as Record<NodeId, SkillGroup>
+);
+
 const NODE_POSITIONS: Record<NodeId, Position> = {
-  backend: { x: 51, y: 50, depth: 0.2 },
-  programming: { x: 51, y: 18, depth: 0.35 },
-  frontend: { x: 23, y: 34, depth: 0.28 },
-  databases: { x: 24, y: 72, depth: 0.3 },
-  devops: { x: 78, y: 70, depth: 0.32 },
-  core: { x: 79, y: 32, depth: 0.24 },
+  backend: { x: 50, y: 50, depth: 0.2 },
+  programming: { x: 50, y: 18, depth: 0.34 },
+  frontend: { x: 20, y: 35, depth: 0.28 },
+  databases: { x: 26, y: 73, depth: 0.3 },
+  devops: { x: 80, y: 71, depth: 0.32 },
+  core: { x: 80, y: 33, depth: 0.26 },
 };
 
 const EDGES: Array<{ from: NodeId; to: NodeId }> = [
+  { from: "core", to: "backend" },
+  { from: "core", to: "frontend" },
+  { from: "core", to: "programming" },
+  { from: "core", to: "databases" },
+  { from: "core", to: "devops" },
   { from: "backend", to: "frontend" },
   { from: "backend", to: "programming" },
   { from: "backend", to: "databases" },
   { from: "backend", to: "devops" },
-  { from: "backend", to: "core" },
-  { from: "programming", to: "frontend" },
 ];
 
 const curvePath = (start: Position, end: Position) => {
@@ -197,50 +242,70 @@ const NodeOrb = ({
   index,
   reduceMotion,
   pointer,
+  hoveredId,
   onSelect,
+  onHoverChange,
 }: {
   group: SkillGroup;
   active: boolean;
   position: Position;
   index: number;
   reduceMotion: boolean | null;
-  pointer: { x: number; y: number };
+  pointer: PointerPoint;
+  hoveredId: NodeId | null;
   onSelect: (id: NodeId) => void;
+  onHoverChange: (id: NodeId | null) => void;
 }) => {
-  const sizeClass = active ? "w-36 h-36 md:w-40 md:h-40" : "w-28 h-28 md:w-32 md:h-32";
-  const iconCount = active ? 4 : 3;
+  const isFocused = hoveredId === group.id;
+  const isDimmed = Boolean(hoveredId) && !isFocused;
+
+  const dx = pointer.x - position.x;
+  const dy = pointer.y - position.y;
+  const distance = Math.hypot(dx, dy);
+  const proximity = clamp(1 - distance / 18, 0, 1);
+
+  const parallaxX = reduceMotion ? 0 : (pointer.x - 50) * position.depth * 0.15;
+  const parallaxY = reduceMotion ? 0 : (pointer.y - 50) * position.depth * 0.15;
+  const magneticX = reduceMotion || !isFocused ? 0 : dx * proximity * 0.28;
+  const magneticY = reduceMotion || !isFocused ? 0 : dy * proximity * 0.28;
+  const sizeClass = active ? "h-40 w-40 md:h-44 md:w-44" : "h-32 w-32 md:h-36 md:w-36";
 
   return (
     <motion.button
       type="button"
       onClick={() => onSelect(group.id)}
-      className="absolute -translate-x-1/2 -translate-y-1/2 outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 rounded-full"
+      onMouseEnter={() => onHoverChange(group.id)}
+      onMouseLeave={() => onHoverChange(null)}
+      onFocus={() => onHoverChange(group.id)}
+      onBlur={() => onHoverChange(null)}
+      className={`absolute -translate-x-1/2 -translate-y-1/2 rounded-full outline-none transition-opacity duration-200 focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
+        isDimmed ? "opacity-40" : "opacity-100"
+      }`}
       style={{
         left: `${position.x}%`,
         top: `${position.y}%`,
-        transform: `translate(-50%, -50%) translate3d(${pointer.x * position.depth * 90}px, ${pointer.y * position.depth * 90}px, 0)`,
+        transform: `translate(-50%, -50%) translate3d(${parallaxX + magneticX}px, ${parallaxY + magneticY}px, 0)`,
       }}
       animate={reduceMotion ? undefined : { y: [0, -8, 0] }}
-      transition={{ duration: 4 + index * 0.25, repeat: Infinity, ease: "easeInOut" }}
-      whileHover={{ scale: 1.06 }}
+      transition={{ duration: 4.8 + index * 0.26, repeat: Infinity, ease: "easeInOut" }}
+      whileHover={{ scale: 1.05 }}
       whileTap={{ scale: 0.98 }}
     >
       <div
-        className={`relative ${sizeClass} rounded-full border bg-slate-950/45 backdrop-blur-xl transition-all duration-300 ${
-          active ? `${group.borderClass} shadow-[0_0_44px_rgba(34,211,238,0.24)]` : "border-white/15"
+        className={`relative ${sizeClass} rounded-full border bg-slate-900/45 backdrop-blur-md transition-all duration-300 ${
+          active || isFocused ? `${group.accent.borderClass} ${group.accent.orbGlowClass}` : "border-slate-200/15"
         }`}
       >
-        <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${group.accentBg}`} />
-        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle_at_28%_22%,rgba(255,255,255,0.24),transparent_56%)]" />
-        {active && <span className="absolute -inset-1 rounded-full border border-white/15" />}
+        <div className={`absolute inset-0 rounded-full bg-gradient-to-br ${group.accent.panelClass}`} />
+        <div className="absolute inset-[10%] rounded-full bg-[radial-gradient(circle_at_24%_20%,rgba(255,255,255,0.24),transparent_65%)]" />
 
         <div className="relative z-10 flex h-full flex-wrap items-center justify-center gap-2 p-3">
-          {group.technologies.slice(0, iconCount).map((tech) => {
+          {group.technologies.slice(0, active ? 4 : 3).map((tech) => {
             const Icon = tech.icon;
             return (
               <span
                 key={`${group.id}-${tech.name}`}
-                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/30 shadow-[0_0_14px_rgba(15,23,42,0.8)]"
+                className="flex h-8 w-8 items-center justify-center rounded-full border border-white/15 bg-black/35 shadow-[inset_0_1px_0_rgba(255,255,255,0.15)]"
               >
                 <Icon size={15} className={TECH_ICON_COLOR[tech.name] ?? "text-cyan-300"} />
               </span>
@@ -248,7 +313,8 @@ const NodeOrb = ({
           })}
         </div>
       </div>
-      <p className={`mt-3 text-[10px] font-mono font-black uppercase tracking-[0.18em] ${group.accentText}`}>{group.title}</p>
+
+      <p className={`mt-3 text-[10px] font-mono font-black uppercase tracking-[0.2em] ${group.accent.textClass}`}>{group.title}</p>
     </motion.button>
   );
 };
@@ -256,61 +322,126 @@ const NodeOrb = ({
 const SkillsGalaxy = () => {
   const reduceMotion = useReducedMotion();
   const [selectedId, setSelectedId] = useState<NodeId>("backend");
-  const [pointer, setPointer] = useState({ x: 0, y: 0 });
+  const [pointer, setPointer] = useState<PointerPoint>({ x: 50, y: 50 });
+  const [hoveredId, setHoveredId] = useState<NodeId | null>(null);
 
   const selectedGroup = useMemo(
     () => SKILL_GROUPS.find((group) => group.id === selectedId) ?? SKILL_GROUPS[1],
     [selectedId]
   );
 
-  const onPointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
-    if (reduceMotion) return;
+  const particles = useMemo(
+    () =>
+      Array.from({ length: 20 }, (_, index) => ({
+        id: index,
+        x: Math.round(4 + Math.random() * 92),
+        y: Math.round(4 + Math.random() * 92),
+        size: index % 3 === 0 ? 3 : 2,
+        delay: index * 0.24,
+        duration: 11 + (index % 7),
+      })),
+    []
+  );
+
+  const handlePointerMove = (event: React.PointerEvent<HTMLDivElement>) => {
     const rect = event.currentTarget.getBoundingClientRect();
-    const x = (event.clientX - rect.left) / rect.width - 0.5;
-    const y = (event.clientY - rect.top) / rect.height - 0.5;
+    const x = ((event.clientX - rect.left) / rect.width) * 100;
+    const y = ((event.clientY - rect.top) / rect.height) * 100;
     setPointer({ x, y });
+
+    if (reduceMotion) return;
+
+    let nearest: NodeId | null = null;
+    let nearestDistance = Infinity;
+
+    SKILL_GROUPS.forEach((group) => {
+      const pos = NODE_POSITIONS[group.id];
+      const distance = Math.hypot(x - pos.x, y - pos.y);
+      if (distance < nearestDistance) {
+        nearestDistance = distance;
+        nearest = group.id;
+      }
+    });
+
+    setHoveredId(nearestDistance <= 16 ? nearest : null);
+  };
+
+  const resetPointer = () => {
+    setPointer({ x: 50, y: 50 });
+    setHoveredId(null);
   };
 
   return (
-    <section className="section relative overflow-hidden bg-transparent">
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute inset-0 bg-grid opacity-[0.07]" />
-        <motion.div
-          animate={{ x: [0, 26, 0], y: [0, -20, 0], opacity: [0.3, 0.45, 0.3] }}
-          transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -top-24 left-16 w-72 h-72 rounded-full bg-cyan-500/14 blur-[120px]"
+    <section className="section relative overflow-hidden bg-slate-950/70">
+      <div className="pointer-events-none absolute inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_14%_18%,rgba(30,41,59,0.55),transparent_42%),radial-gradient(circle_at_84%_12%,rgba(34,211,238,0.08),transparent_35%),radial-gradient(circle_at_60%_88%,rgba(167,139,250,0.08),transparent_38%)]" />
+        <div
+          className="absolute inset-0 opacity-[0.12]"
+          style={{
+            backgroundImage: "radial-gradient(rgba(148,163,184,0.75)_0.8px, transparent_0.8px)",
+            backgroundSize: "22px 22px",
+          }}
         />
+
         <motion.div
-          animate={{ x: [0, -20, 0], y: [0, 26, 0], opacity: [0.24, 0.36, 0.24] }}
+          className="absolute -top-20 left-8 h-80 w-80 rounded-full bg-cyan-500/12 blur-[120px]"
+          animate={reduceMotion ? undefined : { x: [0, 24, 0], y: [0, -16, 0], opacity: [0.26, 0.4, 0.26] }}
           transition={{ duration: 16, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute -bottom-20 right-10 w-80 h-80 rounded-full bg-violet-500/14 blur-[130px]"
         />
+        <motion.div
+          className="absolute bottom-6 -left-14 h-72 w-72 rounded-full bg-emerald-500/10 blur-[120px]"
+          animate={reduceMotion ? undefined : { x: [0, -12, 0], y: [0, 18, 0], opacity: [0.22, 0.35, 0.22] }}
+          transition={{ duration: 17, repeat: Infinity, ease: "easeInOut" }}
+        />
+        <motion.div
+          className="absolute -right-10 top-20 h-[26rem] w-[26rem] rounded-full bg-violet-500/10 blur-[130px]"
+          animate={reduceMotion ? undefined : { x: [0, -26, 0], y: [0, 20, 0], opacity: [0.2, 0.34, 0.2] }}
+          transition={{ duration: 19, repeat: Infinity, ease: "easeInOut" }}
+        />
+
+        {particles.map((particle) => (
+          <motion.span
+            key={particle.id}
+            className="absolute rounded-full bg-cyan-300/75"
+            style={{
+              left: `${particle.x}%`,
+              top: `${particle.y}%`,
+              width: particle.size,
+              height: particle.size,
+            }}
+            animate={reduceMotion ? undefined : { y: [0, -11, 0], opacity: [0.25, 0.85, 0.25] }}
+            transition={{
+              delay: particle.delay,
+              duration: particle.duration,
+              repeat: Infinity,
+              ease: "easeInOut",
+            }}
+          />
+        ))}
       </div>
 
-      <div className="container mx-auto px-6 relative z-10">
+      <div className="container relative z-10 mx-auto px-5 sm:px-6">
         <motion.div
-          initial={{ opacity: 0, y: 14 }}
+          initial={{ opacity: 0, y: 18 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, amount: 0.2 }}
-          className="max-w-4xl mb-10"
+          viewport={{ once: true, amount: 0.25 }}
+          className="mb-10 max-w-4xl"
         >
-          <p className="text-[11px] font-mono font-black uppercase tracking-[0.34em] text-secondary/85">
-            Skills.ControlCenter()
-          </p>
-          <h2 className="mt-4 text-4xl md:text-6xl font-heading font-black text-white tracking-tight">
-            IMPACT <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-secondary">SKILLS GRID</span>
+          <p className="text-[11px] font-mono font-black uppercase tracking-[0.34em] text-cyan-300/90">Skills.ControlCenter()</p>
+          <h2 className="mt-4 text-4xl font-heading font-black tracking-tight text-white md:text-6xl">
+            3D <span className="text-cyan-300">SKILL GALAXY</span>
           </h2>
-          <p className="mt-4 text-base md:text-lg text-muted-foreground max-w-3xl leading-relaxed">
-            A live architecture-style skills layout. Switch domains to explore the exact technologies I use in production workflows.
+          <p className="mt-4 max-w-3xl text-base leading-relaxed text-slate-300 md:text-lg">
+            Live architecture map of my stack. Select a layer to inspect technologies, docs links, and skill relationships in one interactive view.
           </p>
         </motion.div>
 
-        <div className="grid gap-7 xl:grid-cols-12 items-start">
+        <div className="grid items-start gap-5 xl:grid-cols-12">
           <motion.div
-            initial={{ opacity: 0, x: -12 }}
+            initial={{ opacity: 0, x: -16 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, amount: 0.2 }}
-            className="xl:col-span-4 space-y-4"
+            className="space-y-3.5 xl:col-span-5"
           >
             {SKILL_GROUPS.map((group, index) => {
               const active = selectedId === group.id;
@@ -319,49 +450,63 @@ const SkillsGalaxy = () => {
                   key={group.id}
                   type="button"
                   onClick={() => setSelectedId(group.id)}
-                  initial={{ opacity: 0, y: 10 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                  viewport={{ once: true }}
-                  whileHover={{ x: 4 }}
-                  className={`w-full text-left rounded-2xl border bg-slate-950/45 p-5 backdrop-blur-xl transition-all outline-none focus-visible:ring-2 focus-visible:ring-secondary/60 ${
-                    active ? `${group.borderClass} ${group.glow}` : "border-white/10 hover:border-white/20"
+                  initial={{ opacity: 0, x: -16, y: 6 }}
+                  whileInView={{ opacity: 1, x: 0, y: 0 }}
+                  viewport={{ once: true, amount: 0.3 }}
+                  transition={{ delay: index * 0.1, duration: 0.35, ease: "easeOut" }}
+                  whileHover={{ y: -3 }}
+                  className={`group relative w-full overflow-hidden rounded-2xl border bg-slate-950/65 p-5 text-left backdrop-blur-md transition-all duration-300 outline-none focus-visible:ring-2 focus-visible:ring-cyan-300/60 ${
+                    active ? `${group.accent.borderClass} ${group.accent.glowClass}` : "border-slate-500/35 hover:border-slate-300/35"
                   }`}
                 >
-                  <div className="flex items-start justify-between gap-4">
+                  <div className={`pointer-events-none absolute inset-0 bg-gradient-to-r ${group.accent.panelClass} opacity-0 transition-opacity duration-300 group-hover:opacity-100 ${active ? "opacity-100" : ""}`} />
+                  <div className="relative z-10 flex items-start justify-between gap-4">
                     <div>
-                      <p className={`text-[10px] font-mono font-black uppercase tracking-[0.28em] ${group.accentText}`}>{group.title}</p>
-                      <p className="mt-2 text-sm text-slate-300 leading-relaxed">{group.subtitle}</p>
+                      <p className={`text-[10px] font-mono font-black uppercase tracking-[0.28em] ${group.accent.textClass}`}>{group.title}</p>
+                      <p className="mt-2 text-sm leading-relaxed text-slate-300">{group.subtitle}</p>
                     </div>
-                    <div className="shrink-0 rounded-xl border border-white/10 bg-white/5 px-3 py-1 text-[10px] font-mono font-black uppercase tracking-widest text-white/80">
+                    <span className="shrink-0 rounded-lg border border-white/12 bg-slate-900/70 px-3 py-1 text-[10px] font-mono font-black uppercase tracking-widest text-slate-200">
                       {group.technologies.length}
-                    </div>
+                    </span>
                   </div>
                 </motion.button>
               );
             })}
 
-            <div className={`md:hidden mt-2 rounded-2xl border ${selectedGroup.borderClass} bg-slate-950/45 backdrop-blur-xl p-5`}>
-              <p className={`text-[10px] font-mono font-black uppercase tracking-[0.26em] ${selectedGroup.accentText}`}>Selected</p>
-              <h3 className="mt-2 text-xl font-heading font-black text-white">{selectedGroup.title}</h3>
-              <p className="mt-2 text-sm text-slate-300">{selectedGroup.subtitle}</p>
-              <div className="mt-4 flex flex-wrap gap-2">
-                {selectedGroup.technologies.map((tech) => {
-                  const Icon = tech.icon;
-                  return (
-                    <a
-                      key={tech.name}
-                      href={tech.href}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-flex items-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.05] px-3 py-1.5 text-[10px] font-mono font-black uppercase tracking-wide text-white/90"
-                    >
-                      <Icon size={12} className={TECH_ICON_COLOR[tech.name] ?? "text-cyan-300"} />
-                      {tech.name}
-                    </a>
-                  );
-                })}
-              </div>
+            <div className={`mt-2 rounded-2xl border bg-slate-950/70 p-5 backdrop-blur-md md:hidden ${selectedGroup.accent.borderClass}`}>
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={selectedGroup.id}
+                  initial={{ opacity: 0, y: 14 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -8 }}
+                  transition={{ duration: 0.22 }}
+                >
+                  <p className={`text-[10px] font-mono font-black uppercase tracking-[0.28em] ${selectedGroup.accent.textClass}`}>Active Layer</p>
+                  <h3 className="mt-2 text-2xl font-heading font-black text-white">{selectedGroup.title}</h3>
+                  <p className="mt-2 text-sm text-slate-300">{selectedGroup.subtitle}</p>
+                  <div className="mt-4 flex flex-wrap gap-2">
+                    {selectedGroup.technologies.map((tech, index) => {
+                      const Icon = tech.icon;
+                      return (
+                        <motion.a
+                          key={tech.name}
+                          href={tech.href}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          transition={{ delay: index * 0.05 }}
+                          className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-white/[0.05] px-3 py-1.5 text-[10px] font-mono font-black uppercase tracking-wide text-white/90"
+                        >
+                          <Icon size={12} className={TECH_ICON_COLOR[tech.name] ?? "text-cyan-300"} />
+                          {tech.name}
+                        </motion.a>
+                      );
+                    })}
+                  </div>
+                </motion.div>
+              </AnimatePresence>
             </div>
           </motion.div>
 
@@ -369,29 +514,59 @@ const SkillsGalaxy = () => {
             initial={{ opacity: 0, y: 16 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, amount: 0.2 }}
-            className="xl:col-span-8 hidden md:block"
+            className="hidden xl:col-span-7 md:block"
           >
             <div
-              onPointerMove={onPointerMove}
-              onPointerLeave={() => setPointer({ x: 0, y: 0 })}
-              className="relative rounded-3xl border border-white/10 bg-slate-950/45 backdrop-blur-xl p-4 sm:p-6 min-h-[460px] md:min-h-[540px] overflow-hidden"
+              onPointerMove={handlePointerMove}
+              onPointerLeave={resetPointer}
+              className="relative min-h-[520px] overflow-hidden rounded-[1.75rem] border border-slate-500/30 bg-slate-950/65 p-4 backdrop-blur-md sm:p-6"
             >
-              <svg className="absolute inset-0 w-full h-full pointer-events-none" viewBox="0 0 100 100" preserveAspectRatio="none">
+              <div
+                className="pointer-events-none absolute inset-0 transition-opacity duration-300"
+                style={{
+                  opacity: hoveredId ? 0.9 : 0.5,
+                  background: `radial-gradient(250px circle at ${pointer.x}% ${pointer.y}%, rgba(34,211,238,0.16), transparent 62%)`,
+                }}
+              />
+
+              <svg className="pointer-events-none absolute inset-0 h-full w-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <defs>
+                  {EDGES.map((edge, index) => {
+                    const from = GROUP_LOOKUP[edge.from];
+                    const to = GROUP_LOOKUP[edge.to];
+                    return (
+                      <linearGradient
+                        key={`gradient-${edge.from}-${edge.to}`}
+                        id={`edge-gradient-${index}`}
+                        gradientUnits="userSpaceOnUse"
+                        x1={NODE_POSITIONS[edge.from].x}
+                        y1={NODE_POSITIONS[edge.from].y}
+                        x2={NODE_POSITIONS[edge.to].x}
+                        y2={NODE_POSITIONS[edge.to].y}
+                      >
+                        <stop offset="0%" stopColor={from.accent.lineColor} stopOpacity="0.84" />
+                        <stop offset="100%" stopColor={to.accent.lineColor} stopOpacity="0.72" />
+                      </linearGradient>
+                    );
+                  })}
+                </defs>
+
                 {EDGES.map((edge, index) => {
                   const from = NODE_POSITIONS[edge.from];
                   const to = NODE_POSITIONS[edge.to];
                   const path = curvePath(from, to);
+                  const direction = edge.from === "core" ? -1 : 1;
                   return (
                     <g key={`${edge.from}-${edge.to}`}>
-                      <path d={path} fill="none" stroke="rgba(255,255,255,0.10)" strokeWidth="0.16" />
+                      <path d={path} fill="none" stroke="rgba(148,163,184,0.16)" strokeWidth="0.18" />
                       <motion.path
                         d={path}
                         fill="none"
-                        stroke="rgba(34,211,238,0.30)"
-                        strokeWidth="0.23"
-                        strokeDasharray="1.2 0.85"
-                        animate={reduceMotion ? undefined : { strokeDashoffset: [0, -6] }}
-                        transition={{ duration: 3 + index * 0.35, repeat: Infinity, ease: "linear" }}
+                        stroke={`url(#edge-gradient-${index})`}
+                        strokeWidth="0.30"
+                        strokeDasharray="1.6 1.4"
+                        animate={reduceMotion ? undefined : { strokeDashoffset: [0, direction * 9], opacity: [0.35, 0.95, 0.35] }}
+                        transition={{ duration: 3.4 + index * 0.28, repeat: Infinity, ease: "linear" }}
                       />
                     </g>
                   );
@@ -407,52 +582,57 @@ const SkillsGalaxy = () => {
                   index={index}
                   reduceMotion={reduceMotion}
                   pointer={pointer}
+                  hoveredId={hoveredId}
                   onSelect={setSelectedId}
+                  onHoverChange={setHoveredId}
                 />
               ))}
             </div>
 
-            <div className={`mt-6 rounded-3xl border ${selectedGroup.borderClass} bg-slate-950/45 backdrop-blur-xl p-6 md:p-7`}>
+            <div className={`mt-5 rounded-[1.6rem] border bg-slate-950/70 p-6 backdrop-blur-md md:p-7 ${selectedGroup.accent.borderClass}`}>
               <AnimatePresence mode="wait">
                 <motion.div
                   key={selectedGroup.id}
-                  initial={{ opacity: 0, y: 8 }}
+                  initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 8 }}
-                  transition={{ duration: 0.25 }}
+                  exit={{ opacity: 0, y: -10 }}
+                  transition={{ duration: 0.24 }}
                 >
                   <div className="flex flex-wrap items-start justify-between gap-4">
                     <div>
-                      <p className={`text-[10px] font-mono font-black uppercase tracking-[0.28em] ${selectedGroup.accentText}`}>Active Layer</p>
-                      <h3 className="mt-2 text-2xl md:text-3xl font-heading font-black text-white">{selectedGroup.title}</h3>
-                      <p className="mt-2 text-slate-300">{selectedGroup.subtitle}</p>
+                      <p className={`text-[10px] font-mono font-black uppercase tracking-[0.3em] ${selectedGroup.accent.textClass}`}>Active Layer</p>
+                      <h3 className="mt-2 text-2xl font-heading font-black text-white md:text-3xl">{selectedGroup.title}</h3>
+                      <p className="mt-2 max-w-xl text-slate-300">{selectedGroup.subtitle}</p>
                     </div>
-                    <span className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-3 py-1.5 text-[10px] font-mono font-black uppercase tracking-widest text-white/80">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/[0.05] px-3 py-1.5 text-[10px] font-mono font-black uppercase tracking-widest text-slate-100">
                       <Server size={12} />
                       {selectedGroup.technologies.length} technologies
                     </span>
                   </div>
 
                   <div className="mt-6 flex flex-wrap gap-2.5">
-                    {selectedGroup.technologies.map((tech, index) => {
-                      const Icon = tech.icon;
-                      return (
-                        <motion.a
-                          key={tech.name}
-                          href={tech.href}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          initial={{ opacity: 0, y: 6, scale: 0.98 }}
-                          animate={{ opacity: 1, y: 0, scale: 1 }}
-                          transition={{ delay: index * 0.04 }}
-                          className="inline-flex items-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-3.5 py-2 text-[11px] font-mono font-black uppercase tracking-wider text-white/90 hover:border-secondary/35 hover:bg-white/[0.08] transition-all"
-                        >
-                          <Icon size={14} className={TECH_ICON_COLOR[tech.name] ?? "text-cyan-300"} />
-                          {tech.name}
-                          <ArrowUpRight size={12} className="text-white/60" />
-                        </motion.a>
-                      );
-                    })}
+                    <AnimatePresence mode="popLayout">
+                      {selectedGroup.technologies.map((tech, index) => {
+                        const Icon = tech.icon;
+                        return (
+                          <motion.a
+                            key={`${selectedGroup.id}-${tech.name}`}
+                            href={tech.href}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            initial={{ opacity: 0, y: 10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            exit={{ opacity: 0, y: -6 }}
+                            transition={{ delay: index * 0.05, duration: 0.2 }}
+                            className="inline-flex items-center gap-2 rounded-xl border border-white/12 bg-white/[0.04] px-3.5 py-2 text-[11px] font-mono font-black uppercase tracking-wider text-white/90 transition-all hover:border-cyan-300/45 hover:bg-white/[0.08]"
+                          >
+                            <Icon size={14} className={TECH_ICON_COLOR[tech.name] ?? "text-cyan-300"} />
+                            {tech.name}
+                            <ArrowUpRight size={12} className="text-slate-400" />
+                          </motion.a>
+                        );
+                      })}
+                    </AnimatePresence>
                   </div>
                 </motion.div>
               </AnimatePresence>
