@@ -12,6 +12,7 @@ import {
   Award,
   Trophy,
   ChevronRight,
+  GraduationCap,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -25,7 +26,7 @@ const Navbar = ({ scrollTo, activeSection }) => {
     { id: 'skills', label: 'Skills', icon: Code },
     { id: 'projects', label: 'Projects', icon: Briefcase },
     { id: 'stats', label: 'Stats', icon: BarChart2 },
-    { id: 'resume', label: 'Resume', icon: FileText },
+    { id: 'resume', label: 'Education', icon: GraduationCap },
     { id: 'certifications', label: 'Certificates', icon: Award },
     { id: 'achievements', label: 'Achievements', icon: Trophy },
     { id: 'contact', label: 'Contact', icon: Mail }

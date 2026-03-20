@@ -33,21 +33,21 @@ const ContactCard = ({ icon: Icon, title, value, href, delay, toneClass }) => {
     >
       <div className="p-[2px] rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 group-hover:from-primary/50 group-hover:to-secondary/50 transition-all duration-300 shadow-lg group-hover:shadow-primary/20">
         <div
-          className={`flex items-center gap-4 p-5 rounded-2xl border-2 border-white/10 backdrop-blur-md transition-all duration-300 bg-gradient-to-br ${toneClass}`}
+          className={`flex items-center gap-3 sm:gap-4 p-4 sm:p-5 rounded-2xl border-2 border-white/10 backdrop-blur-md transition-all duration-300 bg-gradient-to-br ${toneClass}`}
         >
-          <div className="w-12 h-12 rounded-xl bg-white/5 flex items-center justify-center text-white/80 border-2 border-white/10 group-hover:border-white/20 group-hover:text-white transition-colors shadow-[0_0_30px_rgb(255_255_255_/_0.04)]">
-            <Icon size={20} />
+          <div className="shrink-0 w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-white/5 flex items-center justify-center text-white/80 border-2 border-white/10 group-hover:border-white/20 group-hover:text-white transition-colors shadow-[0_0_30px_rgb(255_255_255_/_0.04)]">
+            <Icon size={20} className="sm:scale-100 scale-90" />
           </div>
 
           <div className="flex-1 min-w-0">
-            <p className="text-slate-400 font-mono text-[10px] font-black uppercase tracking-[0.22em] mb-0.5">
+            <p className="text-slate-400 font-mono text-[9px] sm:text-[10px] font-black uppercase tracking-[0.22em] mb-0.5 sm:mb-1">
               {title}
             </p>
             <a
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-foreground font-heading font-semibold group-hover:text-white transition-colors block truncate"
+              className="text-sm sm:text-base text-foreground font-heading font-semibold group-hover:text-white transition-colors block truncate"
             >
               {value}
             </a>
@@ -55,7 +55,7 @@ const ContactCard = ({ icon: Icon, title, value, href, delay, toneClass }) => {
 
           <button
             onClick={handleCopy}
-            className="p-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all shrink-0 border-2 border-transparent hover:border-white/10"
+            className="p-2 sm:p-2.5 rounded-lg hover:bg-white/5 text-slate-400 hover:text-white transition-all shrink-0 border-2 border-transparent hover:border-white/10"
             aria-label={`Copy ${title}`}
             title="Copy"
           >
@@ -84,9 +84,9 @@ const FloatingInput = ({ label, name, type = "text", value, onChange, required =
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         rows={isTextArea ? 4 : undefined}
-        className={`w-full px-6 py-4 bg-white/[0.03] border rounded-xl text-white outline-none transition-all duration-300 font-sans text-sm font-medium backdrop-blur-md
+        className={`w-full px-4 sm:px-6 py-3.5 sm:py-4 bg-white/[0.03] border rounded-xl text-white outline-none transition-all duration-300 font-sans text-sm font-medium backdrop-blur-md
           ${isFocused ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(34,211,238,0.2)]" : "border-white/10 hover:border-white/20 hover:bg-white/[0.05]"}
-          ${isTextArea ? "resize-none min-h-[160px]" : ""}
+          ${isTextArea ? "resize-none min-h-[120px] sm:min-h-[160px]" : ""}
         `}
       />
       <label
@@ -187,11 +187,11 @@ const Contact = () => {
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 relative z-10">
-        <div className="max-w-3xl mx-auto mb-20 text-center space-y-4">
+        <div className="max-w-3xl mx-auto mb-12 lg:mb-20 text-center space-y-3 sm:space-y-4">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-surface/50 border border-white/5 text-primary text-[10px] font-mono font-bold uppercase tracking-[0.3em]"
+            className="inline-flex items-center gap-2 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full bg-surface/50 border border-white/5 text-primary text-[9px] sm:text-[10px] font-mono font-bold uppercase tracking-[0.3em]"
           >
             <span className="relative flex h-2 w-2">
               <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary/40 opacity-75"></span>
@@ -203,7 +203,7 @@ const Contact = () => {
           <motion.h2
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
-            className="text-4xl md:text-5xl font-heading font-bold text-white tracking-tight"
+            className="text-3xl sm:text-4xl md:text-5xl font-heading font-bold text-white tracking-tight"
           >
             Let's <span className="text-primary">Connect</span>
           </motion.h2>
@@ -212,15 +212,15 @@ const Contact = () => {
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
-            className="text-muted-foreground text-base md:text-lg leading-relaxed max-w-xl mx-auto"
+            className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed max-w-xl mx-auto px-2"
           >
             Have a project in mind or just want to say hi? I'm always open to new opportunities and collaborations.
           </motion.p>
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-14 items-start max-w-6xl mx-auto">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-14 items-start max-w-6xl mx-auto">
           {/* Left: Contact Info */}
-          <div className="space-y-6">
+          <div className="space-y-4 sm:space-y-6">
             <ContactCard 
               icon={Mail} 
               title="Email Address" 
@@ -265,7 +265,7 @@ const Contact = () => {
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
-            className="tech-card border-2 p-8 md:p-10 relative overflow-hidden bg-surface/30 backdrop-blur-xl self-start"
+            className="tech-card border-2 p-6 sm:p-8 md:p-10 relative overflow-hidden bg-surface/30 backdrop-blur-xl self-start mt-4 lg:mt-0"
           >
             <AnimatePresence mode="wait">
               {formStatus === "success" ? (

@@ -154,11 +154,11 @@ const Hero = ({ scrollTo }: HeroProps) => {
               </span>
             </motion.p>
 
-            <motion.div variants={item} className="flex flex-col sm:flex-row gap-4 pt-2 w-full max-w-xl">
-              <HeroButton variant="primary" onClick={() => scrollTo("projects")} className="w-full sm:w-auto">
-                View Projects <ArrowRight size={18} />
+            <motion.div variants={item} className="flex flex-row flex-wrap sm:flex-nowrap items-center justify-start gap-2 sm:gap-4 pt-2 w-full max-w-3xl">
+              <HeroButton variant="primary" onClick={() => scrollTo("projects")} className="px-4 py-2.5 sm:px-8 sm:py-3.5 text-[10px] sm:text-xs flex-1 sm:flex-none justify-center whitespace-nowrap">
+                View Projects <ArrowRight className="w-3.5 h-3.5 sm:w-[18px] sm:h-[18px] ml-1.5" />
               </HeroButton>
-              <HeroButton variant="secondary" onClick={() => scrollTo("contact")} className="w-full sm:w-auto">
+              <HeroButton variant="secondary" onClick={() => scrollTo("contact")} className="px-4 py-2.5 sm:px-8 sm:py-3.5 text-[10px] sm:text-xs flex-1 sm:flex-none justify-center whitespace-nowrap">
                 Let's Connect
               </HeroButton>
               <HeroButton
@@ -168,7 +168,7 @@ const Hero = ({ scrollTo }: HeroProps) => {
                 download
                 target="_blank"
                 rel="noopener noreferrer"
-                className="w-full sm:w-auto"
+                className="px-4 py-2.5 sm:px-8 sm:py-3.5 text-[10px] sm:text-xs flex-1 sm:flex-none justify-center whitespace-nowrap"
               >
                 Download Resume
               </HeroButton>

@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { createPortal } from "react-dom";
 import { Award, Calendar, Eye, X, ChevronLeft, ChevronRight, CheckCircle2 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -225,75 +226,78 @@ const Certifications = () => {
             </div>
 
             {/* Lightbox Modal */}
-            <AnimatePresence>
-                {selectedImage && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={() => setSelectedImage(null)}
-                        className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md"
-                    >
+            {createPortal(
+                <AnimatePresence>
+                    {selectedImage && (
                         <motion.div
-                            initial={{ scale: 0.95, opacity: 0, y: 10 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.95, opacity: 0, y: 10 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="relative max-w-5xl w-full bg-transparent rounded-2xl overflow-hidden shadow-2xl border border-border"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
+                            onClick={() => setSelectedImage(null)}
+                            className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 bg-black/90 backdrop-blur-md"
                         >
-                            <button 
-                                onClick={() => setSelectedImage(null)}
-                                className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-surface text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors border border-border"
+                            <motion.div
+                                initial={{ scale: 0.95, opacity: 0, y: 10 }}
+                                animate={{ scale: 1, opacity: 1, y: 0 }}
+                                exit={{ scale: 0.95, opacity: 0, y: 10 }}
+                                onClick={(e) => e.stopPropagation()}
+                                className="relative max-w-5xl w-full bg-transparent rounded-2xl overflow-hidden shadow-2xl border border-border"
                             >
-                                <X size={20} />
-                            </button>
-                            
-                            <div className="grid md:grid-cols-5 h-full max-h-[85vh] overflow-y-auto">
-                                <div className="md:col-span-3 bg-black flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-border">
-                                    <img 
-                                        src={selectedImage.image} 
-                                        alt={selectedImage.title}
-                                        className="w-full h-auto object-contain max-h-[70vh] rounded border border-white/10 shadow-[0_0_30px_rgb(34_211_238_/_0.10)]"
-                                    />
-                                </div>
-                                <div className="md:col-span-2 p-8 md:p-10 flex flex-col justify-center space-y-8">
-                                    <div className="space-y-4">
-                                        <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface border border-border text-primary text-xs font-mono font-bold uppercase tracking-widest">
-                                            <Award size={14} />
-                                            {selectedImage.issuer}
-                                        </div>
-                                        <h2 className="text-3xl font-heading font-bold text-foreground leading-tight">
-                                            {selectedImage.title}
-                                        </h2>
-                                        <div className="flex items-center gap-3 text-muted-foreground text-xs font-mono font-bold uppercase tracking-widest">
-                                            <Calendar size={14} className="text-primary" />
-                                            {selectedImage.date}
-                                        </div>
+                                <button 
+                                    onClick={() => setSelectedImage(null)}
+                                    className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-surface text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors border border-border"
+                                >
+                                    <X size={20} />
+                                </button>
+                                
+                                <div className="grid md:grid-cols-5 h-full max-h-[85vh] overflow-y-auto">
+                                    <div className="md:col-span-3 bg-black flex items-center justify-center p-6 border-b md:border-b-0 md:border-r border-border">
+                                        <img 
+                                            src={selectedImage.image} 
+                                            alt={selectedImage.title}
+                                            className="w-full h-auto object-contain max-h-[70vh] rounded border border-white/10 shadow-[0_0_30px_rgb(34_211_238_/_0.10)]"
+                                        />
                                     </div>
-                                    
-                                    <div className="space-y-2">
-                                        <h4 className="text-[10px] font-mono font-bold text-white/30 uppercase tracking-widest">Description</h4>
-                                        <p className="text-muted-foreground leading-relaxed text-sm">
-                                            {selectedImage.description}
-                                        </p>
-                                    </div>
+                                    <div className="md:col-span-2 p-8 md:p-10 flex flex-col justify-center space-y-8">
+                                        <div className="space-y-4">
+                                            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md bg-surface border border-border text-primary text-xs font-mono font-bold uppercase tracking-widest">
+                                                <Award size={14} />
+                                                {selectedImage.issuer}
+                                            </div>
+                                            <h2 className="text-3xl font-heading font-bold text-foreground leading-tight">
+                                                {selectedImage.title}
+                                            </h2>
+                                            <div className="flex items-center gap-3 text-muted-foreground text-xs font-mono font-bold uppercase tracking-widest">
+                                                <Calendar size={14} className="text-primary" />
+                                                {selectedImage.date}
+                                            </div>
+                                        </div>
+                                        
+                                        <div className="space-y-2">
+                                            <h4 className="text-[10px] font-mono font-bold text-white/30 uppercase tracking-widest">Description</h4>
+                                            <p className="text-muted-foreground leading-relaxed text-sm">
+                                                {selectedImage.description}
+                                            </p>
+                                        </div>
 
-                                    <div className="pt-6 flex gap-3 border-t border-border/50">
-                                        <div className="flex-1 p-4 rounded-xl bg-surface border border-border flex flex-col items-center text-center space-y-1">
-                                            <CheckCircle2 size={20} className="text-primary mb-1" />
-                                            <span className="text-foreground font-mono font-bold text-[10px] uppercase tracking-widest">Verified</span>
-                                        </div>
-                                        <div className="flex-1 p-4 rounded-xl bg-surface border border-border flex flex-col items-center text-center space-y-1">
-                                            <Eye size={20} className="text-primary mb-1" />
-                                            <span className="text-foreground font-mono font-bold text-[10px] uppercase tracking-widest">Authentic</span>
+                                        <div className="pt-6 flex gap-3 border-t border-border/50">
+                                            <div className="flex-1 p-4 rounded-xl bg-surface border border-border flex flex-col items-center text-center space-y-1">
+                                                <CheckCircle2 size={20} className="text-primary mb-1" />
+                                                <span className="text-foreground font-mono font-bold text-[10px] uppercase tracking-widest">Verified</span>
+                                            </div>
+                                            <div className="flex-1 p-4 rounded-xl bg-surface border border-border flex flex-col items-center text-center space-y-1">
+                                                <Eye size={20} className="text-primary mb-1" />
+                                                <span className="text-foreground font-mono font-bold text-[10px] uppercase tracking-widest">Authentic</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </div>
+                            </motion.div>
                         </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                    )}
+                </AnimatePresence>,
+                document.body
+            )}
         </section>
     );
 };
