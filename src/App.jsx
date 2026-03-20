@@ -23,6 +23,7 @@ const SectionWrapper = ({ children, id }) => (
     whileInView="visible"
     viewport={{ once: true, amount: 0.15 }}
     variants={fadeInUp}
+    style={{ scrollMarginTop: '112px' }}
   >
     {children}
   </motion.div>
@@ -41,7 +42,7 @@ const App = () => {
   const [activeSection, setActiveSection] = useState('home');
 
   useEffect(() => {
-    const sectionIds = ['home', 'about', 'skills', 'projects', 'stats', 'resume', 'contact', 'certifications', 'achievements'];
+    const sectionIds = ['home', 'about', 'skills', 'projects', 'stats', 'resume', 'certifications', 'achievements', 'contact'];
     const observerCallback = (entries) => {
       entries.forEach((entry) => {
         if (entry.isIntersecting) {
@@ -69,7 +70,12 @@ const App = () => {
     setActiveSection(id);
     const element = document.getElementById(id);
     if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
+      const header = document.querySelector('header');
+      const headerOffset = header ? header.offsetHeight : 0;
+      const elementTop = element.getBoundingClientRect().top + window.scrollY;
+      const top = Math.max(elementTop - headerOffset - 16, 0);
+
+      window.scrollTo({ top, behavior: 'smooth' });
     }
   };
 

@@ -1,88 +1,138 @@
-import React, { useMemo, useState } from "react";
+import React from "react";
 import { motion } from "framer-motion";
-import { TypeAnimation } from "react-type-animation";
+
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: {
+      staggerChildren: 0.5,
+      delayChildren: 0.2,
+    },
+  },
+};
+
+const lineVariants = {
+  hidden: { opacity: 0, y: 20, filter: "blur(4px)" },
+  visible: {
+    opacity: 1,
+    y: 0,
+    filter: "blur(0px)",
+    transition: { duration: 1.0, ease: [0.16, 1, 0.3, 1] },
+  },
+};
 
 const AboutIntroTyping = () => {
-  const [done, setDone] = useState(false);
-
-  const introLine = useMemo(
-    () =>
-      "I am a Full Stack Web Developer passionate about building scalable web applications and solving real‑world problems through technology.",
-    []
-  );
-
   return (
-    <div className="relative space-y-5">
-      {/* Typed intro line */}
-      <p className="text-[17px] md:text-lg text-muted-foreground leading-relaxed font-medium">
-        {done ? (
-          <span>{introLine}</span>
-        ) : (
-          <TypeAnimation
-            sequence={[
-              introLine,
-              300,
-              () => {
-                setDone(true);
-              },
-            ]}
-            speed={75}
-            repeat={0}
-            cursor={true}
-            wrapper="span"
-          />
-        )}
-      </p>
+    <motion.div
+      variants={containerVariants}
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, amount: 0.1 }}
+      className="relative space-y-6 text-[16px] leading-relaxed md:text-[17px]"
+    >
+      <motion.p variants={lineVariants} className="text-lg font-medium text-slate-50 md:text-xl">
+        I am a{" "}
+        <span className="rounded-md border border-cyan-300/20 bg-cyan-400/10 px-2 py-0.5 font-black text-cyan-200 shadow-[0_0_20px_rgba(34,211,238,0.08)]">
+          Full Stack Web Developer
+        </span>{" "}
+        passionate about building scalable web applications and solving real-world
+        problems through technology.
+      </motion.p>
 
-      {/* Rest of the content appears after typing finishes */}
-      <motion.div
-        initial={{ opacity: 0, y: 12 }}
-        animate={done ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
-        transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-        className="space-y-5 text-[16px] md:text-[17px] text-muted-foreground leading-relaxed font-medium"
+      <motion.p variants={lineVariants} className="font-medium text-muted-foreground">
+        I specialize in the{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-cyan-300">
+          MERN stack
+        </span>{" "}
+        and enjoy designing{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-sky-300">
+          efficient backend systems
+        </span>
+        ,{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-sky-300">
+          responsive user interfaces
+        </span>
+        , and{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-indigo-300">
+          reliable full-stack architectures
+        </span>{" "}
+        that feel fast and intuitive.
+      </motion.p>
+
+      <motion.p variants={lineVariants} className="font-medium text-muted-foreground">
+        My work focuses on building modern applications with{" "}
+        <span className="cursor-default font-black text-white drop-shadow-sm transition-colors hover:text-cyan-300">
+          React.js
+        </span>
+        ,{" "}
+        <span className="cursor-default font-black text-white drop-shadow-sm transition-colors hover:text-cyan-300">
+          Node.js
+        </span>
+        ,{" "}
+        <span className="cursor-default font-black text-white drop-shadow-sm transition-colors hover:text-cyan-300">
+          Express.js
+        </span>
+        , and{" "}
+        <span className="cursor-default font-black text-white drop-shadow-sm transition-colors hover:text-cyan-300">
+          MongoDB
+        </span>
+        , while also working with relational databases like{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-sky-300">
+          MySQL
+        </span>{" "}
+        and{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-sky-300">
+          PostgreSQL
+        </span>
+        . I build secure REST APIs with authentication using{" "}
+        <span className="font-black text-white transition-colors hover:text-indigo-300">
+          JWT
+        </span>{" "}
+        and lean on{" "}
+        <span className="font-black text-white transition-colors hover:text-cyan-300">
+          Docker
+        </span>
+        ,{" "}
+        <span className="font-black text-white transition-colors hover:text-cyan-300">
+          Git
+        </span>
+        , and{" "}
+        <span className="font-black text-white transition-colors hover:text-cyan-300">
+          Linux
+        </span>{" "}
+        to ship production-ready systems.
+      </motion.p>
+
+      <motion.p variants={lineVariants} className="font-medium text-muted-foreground">
+        Through projects like a{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-cyan-300">
+          Recipe Generator
+        </span>{" "}
+        platform, a{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-sky-300">
+          Smart Agriculture
+        </span>{" "}
+        diagnostic system, and a{" "}
+        <span className="cursor-default font-black text-white transition-colors hover:text-indigo-300">
+          consultant documentation
+        </span>{" "}
+        portal, I've gained hands-on experience in backend engineering, API
+        architecture, and database optimization.
+      </motion.p>
+
+      <motion.p
+        variants={lineVariants}
+        className="mt-4 rounded-r-lg border-l-2 border-cyan-300/40 bg-cyan-300/5 py-1 pl-4 font-medium italic text-slate-300"
       >
-        <p>
-          I specialize in the{" "}
-          <span className="text-white font-black">MERN stack</span> and enjoy designing{" "}
-          <span className="text-secondary font-black">efficient backend systems</span>,{" "}
-          <span className="text-secondary font-black">responsive user interfaces</span>, and{" "}
-          <span className="text-white font-black">reliable full‑stack architectures</span> that feel fast and intuitive.
-        </p>
-
-        <p>
-          My work focuses on building modern applications with{" "}
-          <span className="text-secondary font-black">React.js</span>,{" "}
-          <span className="text-secondary font-black">Node.js</span>,{" "}
-          <span className="text-white font-black">Express.js</span>, and{" "}
-          <span className="text-secondary font-black">MongoDB</span>, while also working with relational databases like{" "}
-          <span className="text-white font-black">MySQL</span> and{" "}
-          <span className="text-white font-black">PostgreSQL</span>. I build secure{" "}
-          <span className="text-secondary font-black">REST APIs</span> with authentication using{" "}
-          <span className="text-secondary font-black">JWT</span> and lean on{" "}
-          <span className="text-secondary font-black">Docker</span>,{" "}
-          <span className="text-white font-black">Git</span>, and{" "}
-          <span className="text-white font-black">Linux</span> to ship production‑ready systems.
-        </p>
-
-        <p>
-          Through projects like a{" "}
-          <span className="text-secondary font-black">Recipe Generator</span> platform, a{" "}
-          <span className="text-secondary font-black">Smart Agriculture</span> diagnostic system, and a{" "}
-          <span className="text-secondary font-black">consultant documentation</span> portal, I’ve gained hands‑on
-          experience in{" "}
-          <span className="text-white font-black">backend engineering</span>,{" "}
-          <span className="text-white font-black">API architecture</span>, and{" "}
-          <span className="text-white font-black">database optimization</span>.
-        </p>
-
-        <p>
-          I’m currently focused on{" "}
-          <span className="text-white font-black">scalable system design</span>,{" "}
-          <span className="text-secondary font-black">cloud‑native architectures</span>, and shipping products that feel
-          as good to maintain as they are to use.
-        </p>
-      </motion.div>
-    </div>
+        I'm currently focused on{" "}
+        <span className="font-black not-italic text-white">scalable system design</span>,{" "}
+        <span className="font-black not-italic text-white transition-colors hover:text-cyan-300">
+          cloud-native architectures
+        </span>
+        , and shipping products that feel as good to maintain as they are to use.
+      </motion.p>
+    </motion.div>
   );
 };
 

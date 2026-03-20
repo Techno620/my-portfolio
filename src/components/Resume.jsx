@@ -146,7 +146,9 @@ const Resume = () => {
               {experiences.map((exp, i) => (
                 <motion.div key={i} variants={revealItem} className="relative">
                   {/* Timeline Dot */}
-                <div className="absolute left-3 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-[#020617] border-2 border-primary/60 shadow-[0_0_12px_rgba(34,211,238,0.35)] z-10" />
+                  <div className="absolute left-3 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-[#020617] border-2 border-primary/60 shadow-[0_0_12px_rgba(34,211,238,0.5)] z-10 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                  </div>
                   
                   <SpotlightCard
                     accent="bg-gradient-to-br from-primary/10 via-transparent to-transparent"
@@ -163,8 +165,8 @@ const Resume = () => {
                         </p>
                       </div>
                       
-                      <div className="flex items-center gap-2 text-slate-200/70 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                        <Calendar size={12} className="text-secondary" />
+                      <div className="shrink-0 whitespace-nowrap flex items-center gap-2 text-slate-200/70 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 group-hover:border-primary/30 group-hover:text-primary transition-colors">
+                        <Calendar size={12} className="text-primary opacity-70 group-hover:opacity-100 transition-opacity" />
                         <span>{exp.duration}</span>
                       </div>
                     </div>
@@ -175,7 +177,7 @@ const Resume = () => {
 
                     <div className="flex flex-wrap gap-2">
                       {exp.skills.map((skill, si) => (
-                        <span key={si} className="text-[9px] font-mono font-bold uppercase tracking-widest px-2 py-1 rounded-md bg-white/5 text-white/90 border border-white/10">
+                        <span key={si} className="text-[9px] font-mono font-bold uppercase tracking-widest px-2.5 py-1 rounded-md bg-primary/5 text-primary border border-primary/20 hover:bg-primary/20 transition-all cursor-default">
                           {skill}
                         </span>
                       ))}
@@ -205,7 +207,9 @@ const Resume = () => {
               {education.map((edu, i) => (
                 <motion.div key={i} variants={revealItem} className="relative">
                   {/* Timeline Dot */}
-                  <div className="absolute left-3 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-[#020617] border-2 border-secondary/70 shadow-[0_0_12px_rgba(34,211,238,0.32)] z-10" />
+                  <div className="absolute left-3 top-7 -translate-x-1/2 w-4 h-4 rounded-full bg-[#020617] border-2 border-secondary/70 shadow-[0_0_12px_rgba(167,139,250,0.5)] z-10 flex items-center justify-center">
+                    <div className="w-1.5 h-1.5 rounded-full bg-secondary animate-pulse" />
+                  </div>
                   
                   <SpotlightCard
                     accent="bg-gradient-to-br from-secondary/10 via-transparent to-transparent"
@@ -222,8 +226,8 @@ const Resume = () => {
                         </p>
                       </div>
 
-                      <div className="flex items-center gap-2 text-slate-200/70 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/5 border border-white/10">
-                        <Calendar size={12} className="text-secondary" />
+                      <div className="shrink-0 whitespace-nowrap flex items-center gap-2 text-slate-200/70 text-[10px] font-mono font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 group-hover:border-secondary/30 group-hover:text-secondary transition-colors">
+                        <Calendar size={12} className="text-secondary opacity-70 group-hover:opacity-100 transition-opacity" />
                         <span>{edu.year}</span>
                       </div>
                     </div>

@@ -2,12 +2,12 @@ import React, { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Activity, Binary, ExternalLink, Github, Loader2, Trophy } from 'lucide-react';
 import {
+  Area,
+  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
   Cell,
-  Line,
-  LineChart,
   Tooltip,
   XAxis,
   YAxis,
@@ -53,6 +53,8 @@ const FALLBACK_LEETCODE = {
   easySolved: 65,
   mediumSolved: 62,
   hardSolved: 15,
+  ranking: 123456,
+  acceptanceRate: 55.5,
 };
 
 const FALLBACK_HACKERRANK = {
@@ -205,7 +207,7 @@ const normalizeHackerRankData = (profilePayload, badgesPayload, skillsPayload, c
     .slice(0, 6)
     .map((item, index) => ({
       label: shortLabel(item?.name || item?.skill, `Skill ${index + 1}`),
-      score: Number(item?.score ?? item?.stars ?? item?.points ?? 0) || 0,
+      score: Math.min(5, Math.max(0, Number(item?.stars ?? item?.stars_count ?? (item?.score ? item.score / 20 : 0)) || 0)),
     }))
     .filter((item) => item.score > 0);
 
@@ -213,7 +215,7 @@ const normalizeHackerRankData = (profilePayload, badgesPayload, skillsPayload, c
     .slice(0, 6)
     .map((item, index) => ({
       label: shortLabel(item?.badge_name || item?.topic || item?.name, `Badge ${index + 1}`),
-      score: Number(item?.stars ?? item?.stars_count ?? item?.level ?? 0) || 0,
+      score: Math.min(5, Math.max(0, Number(item?.stars ?? item?.stars_count ?? item?.level ?? 0) || 0)),
     }))
     .filter((item) => item.score > 0);
 
@@ -368,6 +370,7 @@ const CodingStats = () => {
             const nextGithub = {
               followers: user?.followers ?? cachedGithub?.data?.followers ?? FALLBACK_GITHUB.followers,
               public_repos: user?.public_repos ?? cachedGithub?.data?.public_repos ?? FALLBACK_GITHUB.public_repos,
+              public_gists: user?.public_gists ?? cachedGithub?.data?.public_gists ?? 0,
               trendData: hasCommitTrend
                 ? trendFromCommits
                 : hasEventTrend
@@ -410,6 +413,8 @@ const CodingStats = () => {
                 easySolved: Number(lcResult.easySolved || 0),
                 mediumSolved: Number(lcResult.mediumSolved || 0),
                 hardSolved: Number(lcResult.hardSolved || 0),
+                ranking: Number(lcResult.ranking || 0),
+                acceptanceRate: Number(lcResult.acceptanceRate || 0),
               };
               setLeetcodeData(normalized);
               writeCache(CACHE_KEYS.leetcode, normalized);
@@ -494,7 +499,6 @@ const CodingStats = () => {
   const maxCommits = trendData.length ? Math.max(...trendData.map((point) => Number(point.commits) || 0)) : 0;
   const totalSolved = Math.max(1, Number(leetcodeData?.totalSolved || FALLBACK_LEETCODE.totalSolved));
   const hackerRankChartData = hackerRankData?.chartData?.length ? hackerRankData.chartData : FALLBACK_HACKERRANK.chartData;
-  const hackerRankMaxScore = Math.max(10, ...hackerRankChartData.map((point) => Number(point.score) || 0));
 
   const ChartTooltip = ({ active, payload, label }) => {
     if (!active || !payload?.length) return null;
@@ -577,24 +581,34 @@ const CodingStats = () => {
 
               <div ref={githubChartRef} className="h-[280px] w-full">
                 {githubChartWidth > 0 && (
-                  <LineChart width={githubChartWidth} height={280} data={trendData}>
+                  <AreaChart width={githubChartWidth} height={280} data={trendData}>
+                    <defs>
+                      <linearGradient id="colorCommits" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="#22D3EE" stopOpacity={0.3} />
+                        <stop offset="95%" stopColor="#22D3EE" stopOpacity={0} />
+                      </linearGradient>
+                    </defs>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.14)" vertical={false} />
                     <XAxis dataKey="month" stroke="rgba(203,213,225,0.5)" fontSize={11} tickLine={false} axisLine={false} dy={10} fontFamily="JetBrains Mono" />
                     <YAxis stroke="rgba(148,163,184,0.4)" fontSize={11} tickLine={false} axisLine={false} width={30} domain={[0, Math.max(5, maxCommits + 2)]} allowDecimals={false} />
                     <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgba(34,211,238,0.25)', strokeWidth: 1 }} />
-                    <Line type="monotone" dataKey="commits" stroke="#22D3EE" strokeWidth={3} dot={{ r: 3, stroke: '#0f172a', strokeWidth: 2, fill: '#3B82F6' }} activeDot={{ r: 5 }} />
-                  </LineChart>
+                    <Area type="monotone" dataKey="commits" stroke="#22D3EE" fillOpacity={1} fill="url(#colorCommits)" strokeWidth={3} dot={{ r: 3, stroke: '#0f172a', strokeWidth: 2, fill: '#3B82F6' }} activeDot={{ r: 6, fill: '#22D3EE', stroke: '#0f172a', strokeWidth: 2 }} />
+                  </AreaChart>
                 )}
               </div>
 
-              <div className="mt-6 grid grid-cols-2 gap-4 border-t border-white/10 pt-6">
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-white/10 pt-6">
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30">
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Followers</p>
-                  <p className="mt-2 text-2xl font-black text-white">{githubData.followers}</p>
+                  <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400 mb-1">Total Commits (6M)</p>
+                  <p className="text-2xl font-black text-white">{githubData.totalCommits || trendData.reduce((acc, curr) => acc + curr.commits, 0)}</p>
                 </div>
                 <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30">
-                  <p className="text-[10px] font-mono font-bold uppercase tracking-widest text-slate-400">Public Repos</p>
-                  <p className="mt-2 text-2xl font-black text-white">{githubData.public_repos}</p>
+                  <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400 mb-1">Followers</p>
+                  <p className="text-2xl font-black text-white">{githubData.followers}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4 text-center transition-all duration-200 hover:-translate-y-0.5 hover:border-cyan-300/30">
+                  <p className="text-[9px] font-mono font-bold uppercase tracking-widest text-slate-400 mb-1">Public Repos</p>
+                  <p className="text-2xl font-black text-white">{githubData.public_repos}</p>
                 </div>
               </div>
             </div>
@@ -702,13 +716,19 @@ const CodingStats = () => {
                 <div ref={hackerRankChartRef} className="h-[190px] w-full flex-1">
                   {hackerRankChartWidth > 0 && (
                     <BarChart width={hackerRankChartWidth} height={190} data={hackerRankChartData}>
+                      <defs>
+                        <linearGradient id="colorHrBar" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0%" stopColor="#34D399" stopOpacity={0.9} />
+                          <stop offset="100%" stopColor="#059669" stopOpacity={0.4} />
+                        </linearGradient>
+                      </defs>
                       <CartesianGrid strokeDasharray="3 3" stroke="rgba(148,163,184,0.10)" vertical={false} />
                       <XAxis dataKey="label" stroke="rgba(203,213,225,0.45)" fontSize={10} tickLine={false} axisLine={false} fontFamily="JetBrains Mono" />
-                      <YAxis stroke="rgba(148,163,184,0.35)" fontSize={10} tickLine={false} axisLine={false} width={24} domain={[0, hackerRankMaxScore + 10]} allowDecimals={false} />
+                      <YAxis stroke="rgba(148,163,184,0.35)" fontSize={10} tickLine={false} axisLine={false} width={24} domain={[0, 5]} allowDecimals={false} />
                       <Tooltip content={<ChartTooltip />} cursor={{ stroke: 'rgba(34,211,238,0.25)', strokeWidth: 1 }} />
                       <Bar dataKey="score" radius={[6, 6, 0, 0]} animationDuration={900}>
                         {hackerRankChartData.map((entry, index) => (
-                          <Cell key={`${entry.label}-${index}`} fill={HACKERRANK_BAR_COLORS[index % HACKERRANK_BAR_COLORS.length]} />
+                          <Cell key={`${entry.label}-${index}`} fill="url(#colorHrBar)" />
                         ))}
                       </Bar>
                     </BarChart>

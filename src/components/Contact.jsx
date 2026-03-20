@@ -27,10 +27,11 @@ const ContactCard = ({ icon: Icon, title, value, href, delay, toneClass }) => {
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      transition={{ delay, duration: 0.5 }}
+      whileHover={{ y: -5, scale: 1.02 }}
+      transition={{ delay, duration: 0.4 }}
       className="group relative"
     >
-      <div className="p-[2px] rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 group-hover:from-primary/35 group-hover:to-secondary/25 transition-all duration-300">
+      <div className="p-[2px] rounded-2xl bg-gradient-to-r from-primary/20 to-secondary/20 group-hover:from-primary/50 group-hover:to-secondary/50 transition-all duration-300 shadow-lg group-hover:shadow-primary/20">
         <div
           className={`flex items-center gap-4 p-5 rounded-2xl border-2 border-white/10 backdrop-blur-md transition-all duration-300 bg-gradient-to-br ${toneClass}`}
         >
@@ -83,16 +84,16 @@ const FloatingInput = ({ label, name, type = "text", value, onChange, required =
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         rows={isTextArea ? 4 : undefined}
-        className={`w-full px-6 py-4 bg-surface/20 border-2 rounded-2xl text-foreground outline-none transition-all duration-200 font-sans text-sm font-semibold backdrop-blur-md
-          ${isFocused ? "border-primary bg-primary/5 shadow-[0_0_30px_rgb(34_211_238_/_0.12)]" : "border-white/10 hover:border-white/20"}
-          ${isTextArea ? "resize-none min-h-[150px]" : ""}
+        className={`w-full px-6 py-4 bg-white/[0.03] border rounded-xl text-white outline-none transition-all duration-300 font-sans text-sm font-medium backdrop-blur-md
+          ${isFocused ? "border-primary bg-primary/10 shadow-[0_0_20px_rgba(34,211,238,0.2)]" : "border-white/10 hover:border-white/20 hover:bg-white/[0.05]"}
+          ${isTextArea ? "resize-none min-h-[160px]" : ""}
         `}
       />
       <label
         className={`absolute left-6 transition-all duration-300 pointer-events-none font-mono tracking-widest
           ${(isFocused || hasValue)
-            ? "-top-2.5 left-4 px-2 py-0.5 text-[10px] text-secondary bg-surface border-2 border-secondary/25 rounded-lg font-black"
-            : "top-4 text-xs text-slate-500 font-black"
+            ? "-top-2.5 left-4 px-2 py-0 text-[10px] text-primary bg-[#0f172a] border border-primary/30 rounded font-black tracking-widest shadow-sm"
+            : "top-4 text-xs text-slate-400 font-medium tracking-normal"
           }
         `}
       >
@@ -137,7 +138,7 @@ const Particle = ({ delay }) => {
 
 const Contact = () => {
   const [formStatus, setFormStatus] = useState("idle");
-  const [formData, setFormData] = useState({ name: "" , email: "", subject: "", message: "" });
+  const [formData, setFormData] = useState({ name: "" , email: "", message: "" });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -145,7 +146,7 @@ const Contact = () => {
     
     setTimeout(() => {
       setFormStatus("success");
-      setFormData({ name: "", email: "", subject: "", message: "" });
+      setFormData({ name: "", email: "", message: "" });
       
       setTimeout(() => {
         setFormStatus("idle");
@@ -158,7 +159,7 @@ const Contact = () => {
   };
 
   return (
-    <section className="section relative overflow-hidden bg-transparent">
+    <section className="section relative overflow-hidden bg-transparent pb-8 md:pb-10">
       {/* Animated Background Elements */}
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute inset-0 bg-grid opacity-[0.06]" />
@@ -292,11 +293,8 @@ const Contact = () => {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                 >
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <FloatingInput label="Full Name" name="name" value={formData.name} onChange={handleChange} />
-                    <FloatingInput label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} />
-                  </div>
-                  <FloatingInput label="Subject" name="subject" value={formData.subject} onChange={handleChange} />
+                  <FloatingInput label="Full Name" name="name" value={formData.name} onChange={handleChange} />
+                  <FloatingInput label="Email Address" type="email" name="email" value={formData.email} onChange={handleChange} />
                   <FloatingInput label="Your Message" name="message" value={formData.message} onChange={handleChange} isTextArea />
 
                   <MagneticButton
