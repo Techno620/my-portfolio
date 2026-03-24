@@ -202,13 +202,13 @@ const Certifications = () => {
                                         </div>
 
                                         <div className="pt-4 border-t border-border flex items-center justify-between">
-                                            <div className="flex items-center gap-2 text-muted-foreground text-[10px] font-mono font-bold uppercase tracking-widest">
+                                            <div className="flex items-center gap-2 text-slate-300 text-[10px] font-mono font-bold uppercase tracking-widest">
                                                 <Calendar size={12} className="text-primary" />
                                                 {cert.date}
                                             </div>
                                             <button 
                                                 onClick={() => setSelectedImage(cert)}
-                                                className="p-2 rounded-md bg-surface text-muted-foreground hover:bg-primary/20 hover:text-primary transition-all border border-border"
+                                                className="p-2 rounded-md bg-surface text-slate-300 hover:bg-primary/20 hover:text-primary transition-all border border-border"
                                             >
                                                 <Eye size={16} />
                                             </button>
@@ -245,7 +245,7 @@ const Certifications = () => {
                             >
                                 <button 
                                     onClick={() => setSelectedImage(null)}
-                                    className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-surface text-muted-foreground hover:bg-primary/20 hover:text-primary transition-colors border border-border"
+                                    className="absolute top-4 right-4 z-10 p-2 rounded-lg bg-surface text-slate-300 hover:bg-primary/20 hover:text-primary transition-colors border border-border"
                                 >
                                     <X size={20} />
                                 </button>
@@ -267,15 +267,15 @@ const Certifications = () => {
                                             <h2 className="text-3xl font-heading font-bold text-foreground leading-tight">
                                                 {selectedImage.title}
                                             </h2>
-                                            <div className="flex items-center gap-3 text-muted-foreground text-xs font-mono font-bold uppercase tracking-widest">
+                                            <div className="flex items-center gap-3 text-slate-300 text-xs font-mono font-bold uppercase tracking-widest">
                                                 <Calendar size={14} className="text-primary" />
                                                 {selectedImage.date}
                                             </div>
                                         </div>
                                         
                                         <div className="space-y-2">
-                                            <h4 className="text-[10px] font-mono font-bold text-white/30 uppercase tracking-widest">Description</h4>
-                                            <p className="text-muted-foreground leading-relaxed text-sm">
+                                            <h4 className="text-[11px] font-mono font-bold text-white/60 uppercase tracking-widest">Description</h4>
+                                            <p className="text-slate-200 leading-relaxed text-[15px]">
                                                 {selectedImage.description}
                                             </p>
                                         </div>

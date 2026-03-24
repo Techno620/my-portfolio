@@ -172,7 +172,7 @@ const AboutInteractivePanel = () => {
                 className={`relative px-4 py-2.5 rounded-xl text-[11px] font-mono font-black uppercase tracking-widest transition-all flex items-center justify-center sm:justify-start gap-2 overflow-hidden ${
                   isActive
                     ? "text-white shadow-[0_0_20px_rgba(34,211,238,0.08)]"
-                    : "border border-white/5 bg-white/[0.02] text-slate-400 hover:bg-white/[0.05] hover:text-white"
+                    : "border border-white/5 bg-white/[0.02] text-slate-300 hover:bg-white/[0.05] hover:text-white"
                 }`}
               >
                 {isActive && (
@@ -225,12 +225,12 @@ const AboutInteractivePanel = () => {
                         <div className="absolute top-0 right-0 w-24 h-24 bg-white opacity-5 blur-[50px] rounded-full" />
                       )}
                       <div className="flex items-center justify-between gap-3 relative z-10">
-                        <p className={`text-[11px] font-mono font-black uppercase tracking-[0.2em] transition-colors ${selected ? item.colorClass : "text-slate-300"}`}>
+                        <p className={`text-[12px] font-mono font-black uppercase tracking-[0.2em] transition-colors ${selected ? item.colorClass : "text-slate-200"}`}>
                           {item.title}
                         </p>
-                        <Icon size={18} className={`transition-colors ${selected ? item.colorClass : "text-slate-500 group-hover:text-slate-300"}`} />
+                        <Icon size={18} className={`transition-colors ${selected ? item.colorClass : "text-slate-400 group-hover:text-slate-200"}`} />
                       </div>
-                      <p className="text-[12px] text-slate-400 font-medium mt-3 leading-relaxed relative z-10">{item.note}</p>
+                      <p className="text-[13px] text-slate-200 font-medium mt-3 leading-relaxed relative z-10">{item.note}</p>
                     </motion.button>
                   );
                 })}
@@ -284,7 +284,7 @@ const AboutInteractivePanel = () => {
                   <div className="flex justify-between items-start gap-4">
                     <div>
                       <p className="text-white font-heading font-black text-lg tracking-wide">{p.title}</p>
-                      <p className="mt-2 text-sm text-slate-300/90 font-medium leading-relaxed">{p.detail}</p>
+                      <p className="mt-2 text-[15px] text-slate-100 font-medium leading-relaxed">{p.detail}</p>
                     </div>
                     <div className="w-8 h-8 rounded-full bg-white/5 flex items-center justify-center flex-shrink-0 border border-white/10">
                       <Rocket size={14} className="text-white/70" />
@@ -315,7 +315,7 @@ const AboutInteractivePanel = () => {
                   <motion.li 
                     variants={staggerItem}
                     key={i} 
-                    className="flex items-start gap-4 text-[15px] text-slate-300 font-medium p-3 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/5 transition-colors"
+                    className="flex items-start gap-4 text-[16px] text-slate-100 font-medium p-3 rounded-lg hover:bg-white/5 border border-transparent hover:border-white/5 transition-colors"
                   >
                     <div className="mt-1 relative flex items-center justify-center w-4 h-4">
                       <span className="absolute h-full w-full rounded-full bg-cyan-300/20 animate-ping" />
@@ -353,7 +353,7 @@ const AboutInteractivePanel = () => {
                     <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-sky-300/10 transition-transform group-hover:scale-110">
                       <Rocket size={16} className="text-sky-300" />
                     </div>
-                    <span className="text-xs font-mono font-black uppercase tracking-widest text-slate-200 leading-snug break-words">
+                    <span className="text-sm font-mono font-black uppercase tracking-widest text-white leading-snug break-words">
                       {n}
                     </span>
                   </motion.div>
